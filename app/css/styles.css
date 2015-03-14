@@ -1,6 +1,6 @@
 body {    background-color: #eee; padding: 40px 0}
 
-.logo-small{  background: url('../images/logo-small.png') no-repeat center center; padding-left:35px;}
+.logo-small{  background: url('../images/logo-small.png') no-repeat 10px center; padding-left:35px;}
 
 .navbar-right .dropdown{cursor:pointer}
 .pointer{cursor:pointer;}
@@ -17,16 +17,17 @@ body {    background-color: #eee; padding: 40px 0}
 -moz-animation-duration:2s;
 -moz-animation-iteration-count:infinite;
 -moz-animation-timing-function:linear;
+
 }
 
 @-webkit-keyframes rotate {
-    from {-webkit-transform:rotate(0deg);}
-    to {  -webkit-transform:rotate(360deg);}
+    from {-webkit-transform:rotateY(0deg);}
+    to {  -webkit-transform:rotateY(360deg);}
 }
 
 @-moz-keyframes rotate {
-    from {-moz-transform:rotate(0deg);}
-    to {  -moz-transform:rotate(360deg);}
+    from {-moz-transform:rotateY(0deg);}
+    to {  -moz-transform:rotateY(360deg);}
 }
 
 /* None*/
@@ -120,8 +121,7 @@ body {    background-color: #eee; padding: 40px 0}
 /** Roster **/
 .roster .reroll {margin-left:20px}
 .roster li {margin-top:10px;}
-.roster .roster-character{margin-bottom:5px; border-bottom:1px solid #ddd;padding-bottom: 5px;}
-.roster .roster-character.last{border:none;}
-.roster .roster-character.casu {display:none;}
+.roster .group-character, .roster .roster-character{margin-bottom:5px; border-bottom:1px solid #ddd;padding-bottom: 5px;}
+.roster .group-character.last, .roster .roster-character.last{border:none;}
 .roster button {float:right}
 
