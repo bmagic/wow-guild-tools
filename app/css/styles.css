@@ -122,5 +122,6 @@ body {    background-color: #eee; padding: 40px 0}
 .roster li {margin-top:10px;}
 .roster .roster-character{margin-bottom:5px; border-bottom:1px solid #ddd;padding-bottom: 5px;}
 .roster .roster-character.last{border:none;}
+.roster .roster-character.casu {display:none;}
 .roster button {float:right}
 

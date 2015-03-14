@@ -105,7 +105,7 @@ CREATE TABLE IF NOT EXISTS `gt_message` (
 DROP TABLE IF EXISTS `gt_user`;
 CREATE TABLE IF NOT EXISTS `gt_user` (
   `uid` int(11) NOT NULL,
-  `role` text NOT NULL,
+  `urole` text NOT NULL,
   PRIMARY KEY (`uid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 

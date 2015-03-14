@@ -18,41 +18,45 @@
             </ul>
         </div>
         <div class="col-md-9">
-            <h2>Roster</h2>
+            <h2>Roster de raid</h2>
             <div class="row">
                 <div class="col-md-4">
                     <h3>Tanks</h3>
-                    <div class="roster-character"  ng-class="{ 'last' : $last}" ng-repeat="character in allCharacters | filterBy: ['main + role']: '1 tank'" >
-                        <a class="icon class-{{character.class}}" target="_blank" href="{{armoryBaseUrl}}wow/fr/character/{{character.realm}}/{{character.name}}/advanced">{{character.name}}</a> ({{character.ilvl}})
-                        <div class="text-danger" ng-if="character.neck == 0 || enchantsList.indexOf(character.neck) == -1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Enchantement cou</em></div>
-                        <div class="text-danger" ng-if="character.back == 0 || enchantsList.indexOf(character.back) == -1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Enchantement dos</em></div>
-                        <div class="text-danger" ng-if="character.finger1 == 0 || enchantsList.indexOf(character.finger1) == -1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Enchantement doigt 1</em></div>
-                        <div class="text-danger" ng-if="character.finger2 == 0 || enchantsList.indexOf(character.finger2) == -1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Enchantement doigt 2</em></div>
-                        <div class="text-danger" ng-if="character.mainHand == 0 || enchantsList.indexOf(character.mainHand) == -1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Enchantement arme</em></div>
-
-
+                    <div  ng-class="{ 'last' : $last}" ng-repeat="character in allCharacters | filterBy: ['main + role']: '1 tank'" >
+                        <div class="roster-character {{character.urole}}">
+                            <a class="icon class-{{character.class}}" target="_blank" href="{{armoryBaseUrl}}wow/fr/character/{{character.realm}}/{{character.name}}/advanced">{{character.name}}</a> ({{character.ilvl}})
+                            <div class="text-danger" ng-if="character.neck == 0 || enchantsList.indexOf(character.neck) == -1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Enchantement cou</em></div>
+                            <div class="text-danger" ng-if="character.back == 0 || enchantsList.indexOf(character.back) == -1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Enchantement dos</em></div>
+                            <div class="text-danger" ng-if="character.finger1 == 0 || enchantsList.indexOf(character.finger1) == -1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Enchantement doigt 1</em></div>
+                            <div class="text-danger" ng-if="character.finger2 == 0 || enchantsList.indexOf(character.finger2) == -1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Enchantement doigt 2</em></div>
+                            <div class="text-danger" ng-if="character.mainHand == 0 || enchantsList.indexOf(character.mainHand) == -1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Enchantement arme</em></div>
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <h3>Heals</h3>
-                    <div class="roster-character"  ng-class="{ 'last' : $last}" ng-repeat="character in allCharacters | filterBy: ['main + role']: '1 heal'" >
-                        <a class="icon class-{{character.class}}" target="_blank" href="{{armoryBaseUrl}}wow/fr/character/{{character.realm}}/{{character.name}}/advanced">{{character.name}}</a> ({{character.ilvl}})
-                        <div class="text-danger" ng-if="character.neck == 0 || enchantsList.indexOf(character.neck) == -1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Enchantement cou</em></div>
-                        <div class="text-danger" ng-if="character.back == 0 || enchantsList.indexOf(character.back) == -1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Enchantement dos</em></div>
-                        <div class="text-danger" ng-if="character.finger1 == 0 || enchantsList.indexOf(character.finger1) == -1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Enchantement doigt 1</em></div>
-                        <div class="text-danger" ng-if="character.finger2 == 0 || enchantsList.indexOf(character.finger2) == -1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Enchantement doigt 2</em></div>
-                        <div class="text-danger" ng-if="character.mainHand == 0 || enchantsList.indexOf(character.mainHand) == -1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Enchantement arme</em></div>
+                    <div ng-class="{ 'last' : $last}" ng-repeat="character in allCharacters | filterBy: ['main + role']: '1 heal'" >
+                        <div class="roster-character {{character.urole}}">
+                            <a class="icon class-{{character.class}}" target="_blank" href="{{armoryBaseUrl}}wow/fr/character/{{character.realm}}/{{character.name}}/advanced">{{character.name}}</a> ({{character.ilvl}})
+                            <div class="text-danger" ng-if="character.neck == 0 || enchantsList.indexOf(character.neck) == -1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Enchantement cou</em></div>
+                            <div class="text-danger" ng-if="character.back == 0 || enchantsList.indexOf(character.back) == -1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Enchantement dos</em></div>
+                            <div class="text-danger" ng-if="character.finger1 == 0 || enchantsList.indexOf(character.finger1) == -1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Enchantement doigt 1</em></div>
+                            <div class="text-danger" ng-if="character.finger2 == 0 || enchantsList.indexOf(character.finger2) == -1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Enchantement doigt 2</em></div>
+                            <div class="text-danger" ng-if="character.mainHand == 0 || enchantsList.indexOf(character.mainHand) == -1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Enchantement arme</em></div>
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <h3>Dps</h3>
-                    <div class="roster-character"  ng-class="{ 'last' : $last}" ng-repeat="character in allCharacters | filterBy: ['main + role']: '1 dps'" >
-                        <a class="icon class-{{character.class}}" target="_blank" href="{{armoryBaseUrl}}wow/en/character/{{character.realm}}/{{character.name}}/advanced">{{character.name}}</a> ({{character.ilvl}})
-                        <div class="text-danger" ng-if="character.neck == 0 || enchantsList.indexOf(character.neck) == -1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Enchantement cou</em></div>
-                        <div class="text-danger" ng-if="character.back == 0 || enchantsList.indexOf(character.back) == -1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Enchantement dos</em></div>
-                        <div class="text-danger" ng-if="character.finger1 == 0 || enchantsList.indexOf(character.finger1) == -1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Enchantement doigt 1</em></div>
-                        <div class="text-danger" ng-if="character.finger2 == 0 || enchantsList.indexOf(character.finger2) == -1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Enchantement doigt 2</em></div>
-                        <div class="text-danger" ng-if="character.mainHand == 0 || enchantsList.indexOf(character.mainHand) == -1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Enchantement arme</em></div>
+                    <div  ng-class="{ 'last' : $last}" ng-repeat="character in allCharacters | filterBy: ['main + role']: '1 dps'" >
+                        <div class="roster-character {{character.urole}}">
+                            <a class="icon class-{{character.class}}" target="_blank" href="{{armoryBaseUrl}}wow/en/character/{{character.realm}}/{{character.name}}/advanced">{{character.name}}</a> ({{character.ilvl}})
+                            <div class="text-danger" ng-if="character.neck == 0 || enchantsList.indexOf(character.neck) == -1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Enchantement cou</em></div>
+                            <div class="text-danger" ng-if="character.back == 0 || enchantsList.indexOf(character.back) == -1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Enchantement dos</em></div>
+                            <div class="text-danger" ng-if="character.finger1 == 0 || enchantsList.indexOf(character.finger1) == -1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Enchantement doigt 1</em></div>
+                            <div class="text-danger" ng-if="character.finger2 == 0 || enchantsList.indexOf(character.finger2) == -1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Enchantement doigt 2</em></div>
+                            <div class="text-danger" ng-if="character.mainHand == 0 || enchantsList.indexOf(character.mainHand) == -1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Enchantement arme</em></div>
+                        </div>
                     </div>
                 </div>
 

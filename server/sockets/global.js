@@ -17,11 +17,11 @@ module.exports = function(config,io,connection){
             else
                 socket.request.user.class=0;
 
-            var sql = "INSERT INTO gt_user(uid, role)"+
+            var sql = "INSERT INTO gt_user(uid, urole)"+
             "VALUES("+connection.escape(socket.request.user.uid)+", " +
             connection.escape(socket.request.user.role)+") " +
             "ON DUPLICATE KEY UPDATE uid="+connection.escape(socket.request.user.uid)+", "+
-            "role="+connection.escape(socket.request.user.role);
+            "urole="+connection.escape(socket.request.user.role);
             connection.query(sql, function(err, rows, fields) {
                 if (err) return console.log(err);
                 users.push(socket.request.user);

@@ -5,7 +5,7 @@ Install client lib
 bower install 
 
 Install server lib (soon a npm config file)
-server/npm install asyncbody-parser cookie-session datejs express-mysql-session mysql passport-local path socket.io bcrypt cookie-parser cron express express-session passport passport.socketio sha1 xml2js
+server/npm install async body-parser cookie-session datejs express-mysql-session mysql passport-local path socket.io bcrypt cookie-parser cron express express-session passport passport.socketio sha1 xml2js
 
 Delete passport in passport.socketio (it's too old ... )
 

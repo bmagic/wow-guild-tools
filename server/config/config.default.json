@@ -1,0 +1,33 @@
+{
+  "mysql" : {
+    "host" : "localhost",
+    "port" : "3306",
+    "user" : "",
+    "password" : "",
+    "database" : ""
+  },
+  "mysql_phpbb3" : {
+    "host" : "localhost",
+    "port" : "3306",
+    "user" : "",
+    "password" : "",
+    "database" : ""
+  },
+  "session_cookie_secret":"",
+  "feeds":{
+    "mmochampion" : "http://www.mmo-champion.com/external.php?do=rss&type=newcontent&sectionid=1&days=120&count=10",
+    "judgehype" : "http://worldofwarcraft.judgehype.com/nouvelles.xml"
+  },
+  "roles":{
+    "officier":4,
+    "membre":8,
+    "apply":10,
+    "casu":9
+  },
+  "battlenet": {
+    "baseurl": "https://eu.api.battle.net/wow/",
+    "apikey": ""
+  },
+  "warcraftlogs_id":0
+
+}
