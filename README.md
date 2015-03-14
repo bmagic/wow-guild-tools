@@ -14,9 +14,8 @@ You need :
 `bower install`
 
 ###Install server lib
-`cd server`
-`npm install`
-
+    `cd server`
+    `npm install`
 _Delete passport in passport.socketio (it's too old ... )_
 
 ###Install database structure
@@ -27,10 +26,10 @@ Rename & Edit config file (you need a functionnal PhpBB forum for authentication
 
 ##Launch
 Simply launch it with nodejs 
-`node server/server.js` 
 
-Then go to : 
-`http://localhost:3000/`
+`node server/server.js`
+
+Then go to : `http://localhost:3000/`
 
 
 
