@@ -76,17 +76,18 @@ app.use(function(req, res, next) {
         req.path.indexOf('.css') != -1 ||
         req.path.indexOf('.js') != -1
     ) { return next(); }
-    
+
     connectionPhpbb3.query('SELECT config_value from `phpbb_config` where config_name=?', ['cookie_name'], function(err, rows, fields) {
         if (!err && rows[0] && req.cookies[rows[0].config_value+"_sid"]) {
-	    console.log('auth by cookie')
-	    req.body.username = "azinya"
-	    req.body.password = "tatayoyo"
-	    console.log(req.body)
-	    passport.authenticate('form_auth', { });
-	} else {
-	    res.redirect('/login.html');
+            console.log('auth by cookie');
+            console.log(req.cookies[rows[0].config_value+"_sid"]);
+//            passport.deserializeUser(req.cookies[rows[0].config_value+"_sid"]);
+
+
+        } else {
+            //res.redirect('/login.html');
         }
+        res.redirect('/login.html');
     });
 
 
@@ -107,13 +108,6 @@ app.get('/logout', function(req, res){
     res.redirect('/login.html');
 });
 
-passport.use('phpbb_cookie', new LocalStrategy(
-    function(username, password, done) {
-	console.log('toto')
-        return done(null, {"uid":0,"username":'titi',"role":'officier'});
-    }
-));
-
 passport.use('form_auth', new LocalStrategy(
     function(username, password, done) {
         var username_clean = username.toLowerCase();
@@ -130,19 +124,19 @@ passport.use('form_auth', new LocalStrategy(
 
             var uid = rows[0].user_id;
             connectionPhpbb3.query('SELECT group_id from `phpbb_user_group` where `user_id`=?', [uid], function(err, rows, fields) {
-		if (err) return done(err);
-		var roles = []
+                if (err) return done(err);
+                var roles = []
                 rows.forEach(function(item){
-		    config.roles.forEach(function(d,i){
+                    config.roles.forEach(function(d,i){
                         if (item.group_id == d.phpbb_id) roles.push(i)
-		    });
+                    });
                 });
-		if (roles.length == 0) return done(null, false, { message: 'Permissions insuffisantes' });
-		var role = config.roles[Math.min.apply(null,roles)].name
+                if (roles.length == 0) return done(null, false, { message: 'Permissions insuffisantes' });
+                var role = config.roles[Math.min.apply(null,roles)].name
                 return done(null, {"uid":uid,"username":username,"role":role});
             });
         });
-	return res
+        return res
     }
 ));
 
@@ -151,6 +145,7 @@ passport.serializeUser(function(user, done) {
 });
 
 passport.deserializeUser(function(obj, done) {
+    console.log(obj);
     done(null, obj);
 });
 
