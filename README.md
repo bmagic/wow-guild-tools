@@ -1,23 +1,36 @@
 # wow-guild-tools
-WoW Guild Tools (raids preparations / enchant check / chat / news ) 
+WoW Guild Tools (raids preparations / enchant check / chat / news ).
+Authentication is provided by phpBB3.1!!! So you need a proper 3.1 phpBB installation.
 
-Install client lib 
-bower install 
+##Installation
+###Requirements
+You need : 
 
-Install server lib (soon a npm config file)
-server/npm install async body-parser cookie-session datejs express-mysql-session mysql passport-local path socket.io bcrypt cookie-parser cron express express-session passport passport.socketio sha1 xml2js
+* bower 
+* nodejs
+* npm
 
-Delete passport in passport.socketio (it's too old ... )
+###Install client lib 
+`bower install`
 
-Install Database with database.sql 
+###Install server lib
+`cd server`
+`npm install`
 
-Rename & Edit config file (you need a functionnal PhpBB forum for authentication)
-server/config/config.default.json -> server/config/config.dev.json
+_Delete passport in passport.socketio (it's too old ... )_
 
-Launch with nodejs 
-node server/server.js 
+###Install database structure
+`mysql -u [user] -p [database]` < database.sql
 
-goto http://localhost:3000/ 
+##Configuration 
+Rename & Edit config file (you need a functionnal PhpBB forum for authentication) from server/config/config.default.json to server/config/config.dev.json
+
+##Launch
+Simply launch it with nodejs 
+`node server/server.js` 
+
+Then go to : 
+`http://localhost:3000/`
 
 
 
