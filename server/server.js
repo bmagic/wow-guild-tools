@@ -80,22 +80,21 @@ app.use(function(req, res, next) {
 
     connectionPhpbb3.query('SELECT config_value from `phpbb_config` where config_name=?', ['cookie_name'], function(err, rows, fields) {
         if (!err && rows[0] && req.cookies[rows[0].config_value+"_sid"]) {
-	    console.log('auth by cookie')
-	    res.redirect('/login')
-	} else {
-	    res.redirect('/login.html');
+            console.log('auth by cookie')
+            res.redirect('/login')
+        } else {
+            res.redirect('/login.html');
         }
-        res.redirect('/login.html');
     });
 });
 
 app.use(express.static(path.join(__dirname ,'../app')));
 
 // Authentication
-app.get('/login', 
+app.get('/login',
     passport.authenticate('phpbb_cookie', {
         successRedirect: '/',
-        failureRedirect: '/login.html',
+        failureRedirect: '/login.html'
         //failureFlash: true
     })
 );
@@ -103,7 +102,7 @@ app.get('/login',
 app.post('/login',
     passport.authenticate('form_auth', {
         successRedirect: '/',
-        failureRedirect: '/login.html',
+        failureRedirect: '/login.html'
         //failureFlash: true
     })
 );
@@ -132,15 +131,15 @@ passport.use('phpbb_cookie', new PhpbbStrategy({},
     function(cookies, done) {
         connectionPhpbb3.query('SELECT config_value from `phpbb_config` where config_name=?', ['cookie_name'], function(err, rows, fields) {
             if (!err && rows[0] && cookies[rows[0].config_value+"_sid"]) {
-		connectionPhpbb3.query('SELECT s.session_user_id, u.username from phpbb_sessions s LEFT JOIN phpbb_users u ON u.user_id = s.session_user_id ' +
-		  'where session_id=?',[cookies[rows[0].config_value+"_sid"]], function(err, rows, fields) {
-		    if (err) return done(err);
-		    if (!rows || rows.length == 0) return done(null, false, { message: 'Session invalide ou expirée' });
+                connectionPhpbb3.query('SELECT s.session_user_id, u.username from phpbb_sessions s LEFT JOIN phpbb_users u ON u.user_id = s.session_user_id ' +
+                'where session_id=?',[cookies[rows[0].config_value+"_sid"]], function(err, rows, fields) {
+                    if (err) return done(err);
+                    if (!rows || rows.length == 0) return done(null, false, { message: 'Session invalide ou expirée' });
 
-		    return get_user_role(rows[0].session_user_id,rows[0].username,done)
-		});
+                    return get_user_role(rows[0].session_user_id,rows[0].username,done)
+                });
             }
-	});
+        });
     }
 ));
 
@@ -155,7 +154,7 @@ passport.use('form_auth', new LocalStrategy({},
             if (!bcrypt.compareSync(password, user_password))
                 return done(null, false, { message: 'Mot de passe ou utilisateur incorrect' });
 
-	    return get_user_role(rows[0].user_id,rows[0].username,done)
+            return get_user_role(rows[0].user_id,rows[0].username,done)
         });
     }
 ));
