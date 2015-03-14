@@ -26,7 +26,7 @@
                         <div>
                             <span ng-if="character.main == 0"><strong>Reroll</strong></span>
                             <span ng-if="character.main == 1"><strong>Main</strong></span>
-                            <span class="icon {{character.role}}"></span>
+                            <span class="icon {{character.role | lowercase}}"></span>
                         </div>
                         <div><span class="icon class-{{character.class}}">{{character.name}}</span> - <em>lvl {{character.level}}</em> - <em>{{character.realm}}</em></div>
 
@@ -34,7 +34,7 @@
                         <div class="icon armory"><a target="_blank" href="{{armoryBaseUrl}}wow/fr/character/{{character.realm}}/{{character.name}}/advanced">Voir sur l'armory</a></div>
                     </div>
                     <div class="actions col-md-8">
-                        <div><span ng-click="setCharacterRole('dps',character)" class="pointer icon dps">DPS</span> <span ng-click="setCharacterRole('heal',character)" class="pointer icon heal">Heal</span> <span ng-click="setCharacterRole('tank',character)" class="pointer icon tank">Tank</span></div>
+                        <div><span ng-click="setCharacterRole('DPS',character)" class="pointer icon dps">DPS</span> <span ng-click="setCharacterRole('HEALING',character)" class="pointer icon healing">Heal</span> <span ng-click="setCharacterRole('TANK',character)" class="pointer icon tank">Tank</span></div>
                         <div class="pointer" ng-click="updateCharacter(character)"><span class="glyphicon glyphicon-refresh"></span> Mettre à jour</div>
                         <div class="pointer" ng-click="setMainCharacter(character)" ng-if="character.main == 0"><span class="glyphicon glyphicon-asterisk"></span> Personnage principal</div>
                         <div class="pointer" ng-if="character.main == 0" ng-click="deleteCharacter(character)"><span class="glyphicon glyphicon-remove"></span> Supprimer</div>

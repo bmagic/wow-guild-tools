@@ -16,7 +16,7 @@ module.exports = function(config,io,connection){
                 }
 
 
-                getBattlenet(config.battlenet.baseurl+"character/"+obj.realm+"/"+obj.name+"?fields=items&locale=fr_FR&apikey="+config.battlenet.apikey,function(json) {
+                getBattlenet(config.battlenet.baseurl+"character/"+obj.realm+"/"+obj.name+"?fields=items,talents&locale=fr_FR&apikey="+config.battlenet.apikey,function(json) {
                     if (json.realm == undefined) {
                         socket.emit('add:character', {"status": "ko", "message": "Personnage introuvable"});
                     }
@@ -27,6 +27,13 @@ module.exports = function(config,io,connection){
                             var main = 0;
                             if (rows.length == 0)
                                 main=1;
+
+                            if (json.talents.length == 1 || json.talents[0].selected == true)
+                                var armory_role = json.talents[0].spec.role;
+                            else
+                                var armory_role = json.talents[1].spec.role;
+
+
                             var sql = "INSERT INTO gt_character SET uid = " + connection.escape(socket.request.user.uid) + ", " +
                                 "name = " + connection.escape(json.name) + "," +
                                 "realm = " + connection.escape(json.realm) + "," +
@@ -36,7 +43,9 @@ module.exports = function(config,io,connection){
                                 "gender = " + connection.escape(json.gender) + "," +
                                 "level = " + connection.escape(json.level) + "," +
                                 "thumbnail = " + connection.escape(json.thumbnail) + "," +
-                                "role = " + connection.escape("dps") + "," +
+                                "role = " + connection.escape("DPS") + "," +
+                                "armory_role = " + connection.escape(armory_role) + "," +
+
                                 "ilvl = " + connection.escape(json.items.averageItemLevelEquipped);
                             connection.query(sql, function (err, result, fields) {
                                 if (err) return console.log(err);
@@ -117,7 +126,7 @@ module.exports = function(config,io,connection){
         });
 
         socket.on('update:character', function(character) {
-            getBattlenet(config.battlenet.baseurl+"character/"+character.realm+"/"+character.name+"?fields=items&locale=fr_FR&apikey="+config.battlenet.apikey,function(json) {
+            getBattlenet(config.battlenet.baseurl+"character/"+character.realm+"/"+character.name+"?fields=items,talents&locale=fr_FR&apikey="+config.battlenet.apikey,function(json) {
                 if (json.realm == undefined) {
                     socket.emit('add:character', {"status": "ko", "message": "Une erreur est survenue"});
                 }
@@ -139,7 +148,7 @@ module.exports = function(config,io,connection){
             connection.query('SELECT * from `gt_character`', function(err, rows, fields) {
                 if (err) return console.log(err);
                 async.eachSeries(rows, function(character,callback){
-                    getBattlenet(config.battlenet.baseurl+"character/"+character.realm+"/"+character.name+"?fields=items&locale=fr_FR&apikey="+config.battlenet.apikey,function(json) {
+                    getBattlenet(config.battlenet.baseurl+"character/"+character.realm+"/"+character.name+"?fields=items,talents&locale=fr_FR&apikey="+config.battlenet.apikey,function(json) {
                         updateCharacter(character.id,json,function(){
                             callback();
                         });
@@ -153,17 +162,24 @@ module.exports = function(config,io,connection){
         });
 
         function updateCharacter(id, json, callback){
-            console.log('update : '+id)
+
+            console.log('update : '+id);
+
+            if (json.talents.length == 1 || json.talents[0].selected == true)
+                var armory_role = json.talents[0].spec.role;
+            else
+                var armory_role = json.talents[1].spec.role;
+
             var sql = "UPDATE `gt_character` SET level = " + connection.escape(json.level) + "," +
                 "thumbnail = " + connection.escape(json.thumbnail) + "," +
                 "ilvl = " + connection.escape(json.items.averageItemLevelEquipped) + "," +
+                "armory_role = " + connection.escape(armory_role) + "," +
                 "last_update = NOW()" +
                 " WHERE id=" + connection.escape(id);
 
             connection.query(sql, function (err, rows, fields) {
                 if (err) return console.log(err);
                 setEnchant(id,json,function(){
-
                     callback();
                 });
             });
