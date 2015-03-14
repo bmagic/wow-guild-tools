@@ -10,6 +10,7 @@ var server = require('http').Server(app);
 var io = require('socket.io')(server);
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
+var PhpbbStrategy = require('./passport-phpbb/strategy');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var cookieSession = require('cookie-session');
@@ -79,27 +80,31 @@ app.use(function(req, res, next) {
 
     connectionPhpbb3.query('SELECT config_value from `phpbb_config` where config_name=?', ['cookie_name'], function(err, rows, fields) {
         if (!err && rows[0] && req.cookies[rows[0].config_value+"_sid"]) {
-            console.log('auth by cookie');
-            console.log(req.cookies[rows[0].config_value+"_sid"]);
-//            passport.deserializeUser(req.cookies[rows[0].config_value+"_sid"]);
-
-
-        } else {
-            //res.redirect('/login.html');
+	    console.log('auth by cookie')
+	    res.redirect('/login')
+	} else {
+	    res.redirect('/login.html');
         }
         res.redirect('/login.html');
     });
-
-
 });
+
 app.use(express.static(path.join(__dirname ,'../app')));
 
 // Authentication
+app.get('/login', 
+    passport.authenticate('phpbb_cookie', {
+        successRedirect: '/',
+        failureRedirect: '/login.html',
+        //failureFlash: true
+    })
+);
+
 app.post('/login',
     passport.authenticate('form_auth', {
         successRedirect: '/',
         failureRedirect: '/login.html',
-        failureMessage: true
+        //failureFlash: true
     })
 );
 
@@ -108,35 +113,50 @@ app.get('/logout', function(req, res){
     res.redirect('/login.html');
 });
 
-passport.use('form_auth', new LocalStrategy(
+function get_user_role(uid,username,done) {
+    connectionPhpbb3.query('SELECT group_id from `phpbb_user_group` where `user_id`=?', [uid], function(err, rows, fields) {
+        if (err) return done(err);
+        var roles = []
+        rows.forEach(function(item){
+            config.roles.forEach(function(d,i){
+                if (item.group_id == d.phpbb_id) roles.push(i)
+            });
+        });
+        if (roles.length == 0) return done(null, false, { message: 'Permissions insuffisantes' });
+        var role = config.roles[Math.min.apply(null,roles)].name
+        return done(null, {"uid":uid,"username":username,"role":role});
+    });
+}
+
+passport.use('phpbb_cookie', new PhpbbStrategy({},
+    function(cookies, done) {
+        connectionPhpbb3.query('SELECT config_value from `phpbb_config` where config_name=?', ['cookie_name'], function(err, rows, fields) {
+            if (!err && rows[0] && cookies[rows[0].config_value+"_sid"]) {
+		connectionPhpbb3.query('SELECT s.session_user_id, u.username from phpbb_sessions s LEFT JOIN phpbb_users u ON u.user_id = s.session_user_id ' +
+		  'where session_id=?',[cookies[rows[0].config_value+"_sid"]], function(err, rows, fields) {
+		    if (err) return done(err);
+		    if (!rows || rows.length == 0) return done(null, false, { message: 'Session invalide ou expirée' });
+
+		    return get_user_role(rows[0].session_user_id,rows[0].username,done)
+		});
+            }
+	});
+    }
+));
+
+passport.use('form_auth', new LocalStrategy({},
     function(username, password, done) {
         var username_clean = username.toLowerCase();
-        res = connectionPhpbb3.query('SELECT user_id, user_password from `phpbb_users` where username_clean=?',[username_clean], function(err, rows, fields) {
+        connectionPhpbb3.query('SELECT user_id, user_password, username from `phpbb_users` where username_clean=?',[username_clean], function(err, rows, fields) {
             if (err) return done(err);
-
-            if (rows.length == 0)
-                return done(null, false, { message: 'Mot de passe ou utilisateur incorrect' });
+            if (!rows || rows.length == 0) return done(null, false, { message: 'Mot de passe ou utilisateur incorrect' });
 
             var user_password = rows[0].user_password.replace('$2y$','$2a$');
-
             if (!bcrypt.compareSync(password, user_password))
                 return done(null, false, { message: 'Mot de passe ou utilisateur incorrect' });
 
-            var uid = rows[0].user_id;
-            connectionPhpbb3.query('SELECT group_id from `phpbb_user_group` where `user_id`=?', [uid], function(err, rows, fields) {
-                if (err) return done(err);
-                var roles = []
-                rows.forEach(function(item){
-                    config.roles.forEach(function(d,i){
-                        if (item.group_id == d.phpbb_id) roles.push(i)
-                    });
-                });
-                if (roles.length == 0) return done(null, false, { message: 'Permissions insuffisantes' });
-                var role = config.roles[Math.min.apply(null,roles)].name
-                return done(null, {"uid":uid,"username":username,"role":role});
-            });
+	    return get_user_role(rows[0].user_id,rows[0].username,done)
         });
-        return res
     }
 ));
 
