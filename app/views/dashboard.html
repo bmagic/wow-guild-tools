@@ -1,0 +1,80 @@
+<div class="dashboard">
+    <h2>Accueil</h2>
+    <div class="row">
+        <div class="col-md-4 feeds">
+            <h3><span class="glyphicon glyphicon-globe"></span> Actualités</h3>
+            <div class="feed-selector">
+                <span title="MMO Champion" class="mmo btn btn-default" ng-class="{ 'active' : !displaymmo}" ng-click="displaymmo = !displaymmo">MMO Champion</span>
+                <span title="JudgeHype" class="jh btn btn-default" ng-class="{ 'active' : !displayjh}" ng-click="displayjh = !displayjh">JudgeHype</span>
+            </div>
+            <ul ng-class="{ 'display-mmo' : !displaymmo , 'display-jh' : !displayjh }">
+                <li ng-repeat="feed in feeds" class="{{feed.source.toLowerCase()}}">
+                    <span am-time-ago="feed.time"></span> -
+                    <a target="_blank" title="{{feed.title}}" href="{{feed.link}}">{{feed.title}}</a>
+                </li>
+            </ul>
+        </div>
+        <div class="col-md-6 chat">
+            <h3><span class="glyphicon glyphicon-envelope"></span> Messagerie</h3>
+
+            <ul scroll-glue>
+                <li ng-repeat="message in messages">
+                    [{{message.date | amDateFormat:'DD/MM HH:mm:ss'}}] <span class="class-{{message.class}}">{{message.username}}</span> : {{message.message}}
+                </li>
+            </ul>
+            <form class="form"  ng-submit="chatSubmit()">
+                <div class="row">
+                    <div class="col-md-10">
+                        <input type="text" placeholder="Tapez votre message de 250 caractères max ..." ng-model="text" class="form-control" maxlength="250">
+
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-default">Envoyer</button>
+
+                    </div>
+                </div>
+
+
+            </form>
+
+
+        </div>
+        <div class="col-md-2">
+            <div class="character">
+                <div ng-if="mainCharacter == 0">
+                    <a href="#/personnages"><span class="glyphicon glyphicon-plus"></span> Ajoutez un personnage</a>
+                </div>
+
+                <div ng-if="mainCharacter != 0" class="row">
+                    <div class="col-md-4">
+                        <img src="{{armoryBaseUrl}}static-render/eu/{{mainCharacter.thumbnail}}" />
+                    </div>
+                    <div class="col-md-8">
+                        <div><span class="class-{{mainCharacter.class}}">{{mainCharacter.name}}</span> - <em>{{mainCharacter.realm}}</em></div>
+                        <div><em>lvl {{mainCharacter.level}}</em></div>
+                        <div>ilvl {{mainCharacter.ilvl}}</div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="online-users">
+                <h3>En ligne</h3>
+                <ul>
+                    <li ng-repeat="onlineUser in onlineUsers | unique: 'uid'"><span class="class-{{onlineUser.class}}">{{onlineUser.username}}</span> <em>({{onlineUser.role}})</em></li>
+                </ul>
+            </div>
+            <div class="raids">
+                <h3>Prochains raids</h3>
+                //TODO Afficher la liste des prochains raids prévus
+            </div>
+            <div class="raids-logs">
+                <h3>Raids logs</h3>
+
+                <div class="raidlog" ng-repeat="raidsLog in raidsLogs">
+                    <a target="_blank" title="{{raidsLog.title}}" href="https://www.warcraftlogs.com{{raidsLog.url}}">{{raidsLog.start| amDateFormat:'DD/MM/YY'}} - {{raidsLog.title}}</a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
