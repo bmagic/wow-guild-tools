@@ -1,4 +1,20 @@
 <div class="raids">
-    <h2>Raids</h2>
-    //TODO
+    <div class="row">
+        <div class="col-md-2">
+            <h1>Raids</h1>
+            <h3>Prochains raids</h3>
+            <div ng-repeat="raid in nextRaids" >
+                <a href="#/raids/raid/{{raid.type}}/{{raid.id}}"><b>{{raid.date | amDateFormat:'dddd Do MMMM '}}</b> - {{raid.name}}</a>
+            </div>
+            <div ng-show="nextRaids.length==0">
+                Aucun raids à venir ...
+            </div>
+        </div>
+        <div class="col-md-10">
+            <div ui-view>
+                <a href="#/raids/add" ><span class="glyphicon glyphicon-plus"></span> Ajouter un raid</a>
+
+            </div>
+        </div>
+    </div>
 </div>

@@ -1,31 +1,48 @@
 'use strict';
-var guildtoolsApp = angular.module('guildtoolsApp', ['guildtoolsApp.config','ngRoute','socket','angularMoment','luegg.directives','angular.filter']);
+var guildtoolsApp = angular.module('guildtoolsApp', ['guildtoolsApp.config','ui.router','socket','angularMoment','luegg.directives','angular.filter','ui.bootstrap.datetimepicker']);
 
-guildtoolsApp.config(['$routeProvider',
-    function($routeProvider) {
-        $routeProvider.
-            when('/', {
-                templateUrl: 'views/dashboard.html',
-                controller: 'DashboardController'
-            }).
-            when('/roster', {
-                templateUrl: 'views/roster.html',
-                controller: 'RosterController'
-            }).
-            when('/raids', {
-                templateUrl: 'views/raids.html'
-            }).
-            when('/personnages', {
-                templateUrl: 'views/characters.html',
-                controller: 'CharactersController'
-            }).
-            when('/absences', {
-                templateUrl: 'views/absences.html'
-            }).
-            otherwise({
-                redirectTo: '/'
-            });
-    }]);
+guildtoolsApp.config(function($stateProvider, $urlRouterProvider) {
+
+    $urlRouterProvider.otherwise("/");
+
+    $stateProvider
+        .state('/', {
+            url: "/",
+            templateUrl: "views/dashboard.html",
+            controller: "DashboardController"
+        })
+        .state('/roster', {
+            url: "/roster",
+            templateUrl: "views/roster.html",
+            controller: "RosterController"
+        })
+        .state('/raids', {
+            url: "/raids",
+            templateUrl: "views/raids.html",
+            controller: "RaidsController"
+        })
+        .state('/raids.add', {
+            url: "/add",
+            templateUrl: "views/raids.add.html",
+            controller: "RaidAddController"
+        })
+        .state('/raids.guild', {
+            url: "/raid/guild/:raidId",
+            templateUrl: "views/raids.guild.html",
+            controller: "RaidGuildController"
+
+        })
+        .state('/personnages', {
+            url: "/personnages",
+            templateUrl: "views/characters.html",
+            controller: "CharactersController"
+        })
+        .state('/absences', {
+            url: "/absences",
+            templateUrl: "views/absences.html"
+        });
+
+});
 
 guildtoolsApp.controller('MainController', ['$scope', 'socket','$location','ARMORY_BASEURL','ENCHANTS_LIST',function($scope,socket,$location,ARMORY_BASEURL,ENCHANTS_LIST){
 
@@ -38,6 +55,7 @@ guildtoolsApp.controller('MainController', ['$scope', 'socket','$location','ARMO
         $scope.username = user.username;
         $scope.role = user.role;
         $scope.class = user.class;
+        $scope.uid = user.uid;
     });
 
     socket.on('get:online-users',function(onlineUsers){
@@ -81,9 +99,12 @@ guildtoolsApp.controller('MainController', ['$scope', 'socket','$location','ARMO
         //Le code suivant est moche je sais ... mon cerveau n'arrive pas à produire un truc plus propre pour le moment ...
         var orderCharacters = [];
         var allRaidCharacters = []
+        var charactersById = {};
         characters.forEach(function (character){
             if (orderCharacters[character.uid] == undefined)
                 orderCharacters[character.uid] = [];
+
+            charactersById[character.id]=character;
             orderCharacters[character.uid].push(character);
 
             if(character.urole != 'casu'){
@@ -98,6 +119,7 @@ guildtoolsApp.controller('MainController', ['$scope', 'socket','$location','ARMO
 
         $scope.orderCharactersByName = orderCharactersByName;
         $scope.allRaidCharacters = allRaidCharacters;
+        $scope.charactersById =  charactersById;
 
 
     });
@@ -143,6 +165,42 @@ guildtoolsApp.controller('MainController', ['$scope', 'socket','$location','ARMO
         socket.emit('get:characters');
     });
 
+    socket.on('get:next-raids', function(nextRaids) {
+        $scope.nextRaids = nextRaids;
+    });
+
+    socket.on('set:raid', function(nextRaids) {
+        angular.element('body').removeClass('loading');
+
+        $scope.raidName = '';
+        $scope.raidDate = Date().toString();
+        $scope.raidType = 'guild';
+        socket.emit('get:next-raids');
+    });
+    socket.on('get:raid', function(raids) {
+        if (raids.length == 0){
+            $location.path('/raids');
+            $location.replace();
+        }
+        $scope.raid = raids[0];
+    });
+    socket.on('get:inscriptions',function(inscriptions){
+        var inscriptionsByCharacterId = {};
+        inscriptions.forEach(function (inscription) {
+            inscriptionsByCharacterId[inscription.character_id]=inscription;
+        });
+        $scope.inscriptionsByCharacterId = inscriptionsByCharacterId;
+
+    });
+    socket.on('get:raid-logs',function(raidLogs){
+        $scope.raidLogs = raidLogs;
+    });
+    socket.on('add:inscription',function(raidId){
+        socket.emit('get:inscriptions',raidId);
+        socket.emit('get:raid-logs',raidId);
+    });
+
+
 
 
 }]);
@@ -157,6 +215,8 @@ guildtoolsApp.controller('DashboardController', ['$scope', 'socket',function($sc
     socket.emit('get:characters');
 
     socket.emit('get:raids-logs');
+
+    socket.emit('get:next-raids');
 
     $scope.chatSubmit = function(){
         if ($scope.text != ''){
@@ -218,5 +278,44 @@ guildtoolsApp.controller('RosterController', ['$scope', 'socket',function($scope
         angular.element('body').addClass('loading');
         socket.emit('update:all-characters');
     }
+}]);
+
+guildtoolsApp.controller('RaidsController', ['$scope', 'socket',function($scope,socket){
+
+    socket.emit('get:next-raids');
+
+
+}]);
+guildtoolsApp.controller('RaidAddController', ['$scope', 'socket',function($scope,socket){
+    $scope.raidName = '';
+    $scope.raidDate = Date().toString();
+    $scope.raidType = 'guild';
+
+    $scope.raidSubmit = function(){
+        angular.element('body').addClass('loading');
+        socket.emit('set:raid',{'name':$scope.raidName,'date':$scope.raidDate,'type':$scope.raidType})
+
+    }
+
+
+
+}]);
+
+guildtoolsApp.controller('RaidGuildController', ['$scope', 'socket','$stateParams',function($scope,socket,$stateParams){
+
+    $scope.inscriptionState = 'ok';
+    $scope.inscriptionMessage = '';
+    socket.emit('get:raid',$stateParams.raidId);
+    socket.emit('get:all-characters');
+    socket.emit('get:inscriptions',$stateParams.raidId);
+    socket.emit('get:characters');
+    socket.emit('get:raid-logs',$stateParams.raidId);
+
+
+
+    $scope.addInscription = function(inscriptionState,inscriptionMessage){
+        socket.emit('add:inscription',{'raid_id':$stateParams.raidId,'state':inscriptionState,'character_id':$scope.mainCharacter.id,'message':inscriptionMessage});
+    }
+
 }]);
 

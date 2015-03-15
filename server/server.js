@@ -33,12 +33,12 @@ var options = {
 var connection = mysql.createConnection(options);
 var sessionStore = new sessionStore(options, connection)
 
-var global = require('./sockets/global.js')(config,io, connection);
+require('./sockets/global.js')(config,io, connection);
+require('./sockets/chat.js')(config,io,connection);
+require('./sockets/characters.js')(config,io,connection);
+require('./sockets/raids.js')(config,io,connection);
+
 var feeds = require('./sockets/feeds.js')(config,io,connection);
-var chat = require('./sockets/chat.js')(config,io,connection);
-var characters = require('./sockets/characters.js')(config,io,connection);
-
-
 var cronJob = require('cron').CronJob;
 new cronJob('0 0 * * * *',feeds.fetchFeeds,null, true);
 feeds.fetchFeeds();

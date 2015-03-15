@@ -128,7 +128,7 @@ module.exports = function(config,io,connection){
         socket.on('update:character', function(character) {
             getBattlenet(config.battlenet.baseurl+"character/"+character.realm+"/"+character.name+"?fields=items,talents&locale=fr_FR&apikey="+config.battlenet.apikey,function(json) {
                 if (json.realm == undefined) {
-                    socket.emit('add:character', {"status": "ko", "message": "Une erreur est survenue"});
+                    socket.emit('add:character', {"status": "ko", "message": "Impossible de contacter l'armory"});
                 }
                 else {
                     updateCharacter(character.id,json,function(){

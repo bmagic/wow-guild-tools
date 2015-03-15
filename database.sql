@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Client: localhost
--- Généré le: Sam 14 Mars 2015 à 14:23
+-- Généré le: Lun 16 Mars 2015 à 00:30
 -- Version du serveur: 5.5.41-0ubuntu0.14.04.1
 -- Version de PHP: 5.5.9-1ubuntu4.6
 
@@ -42,9 +42,10 @@ CREATE TABLE IF NOT EXISTS `gt_character` (
   `thumbnail` text COLLATE utf8_bin NOT NULL,
   `ilvl` int(11) NOT NULL,
   `role` text COLLATE utf8_bin NOT NULL,
+  `armory_role` text COLLATE utf8_bin NOT NULL,
   `last_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=75 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=96 ;
 
 -- --------------------------------------------------------
 
@@ -83,6 +84,22 @@ CREATE TABLE IF NOT EXISTS `gt_feed` (
 -- --------------------------------------------------------
 
 --
+-- Structure de la table `gt_inscription`
+--
+
+DROP TABLE IF EXISTS `gt_inscription`;
+CREATE TABLE IF NOT EXISTS `gt_inscription` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uid` int(11) NOT NULL,
+  `character_id` int(11) NOT NULL,
+  `raid_id` int(11) NOT NULL,
+  `state` text COLLATE utf8_bin NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=8 ;
+
+-- --------------------------------------------------------
+
+--
 -- Structure de la table `gt_message`
 --
 
@@ -94,7 +111,40 @@ CREATE TABLE IF NOT EXISTS `gt_message` (
   `message` text CHARACTER SET latin1 NOT NULL,
   `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=698 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1222 ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `gt_raid`
+--
+
+DROP TABLE IF EXISTS `gt_raid`;
+CREATE TABLE IF NOT EXISTS `gt_raid` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uid` int(11) NOT NULL,
+  `name` text COLLATE utf8_bin NOT NULL,
+  `date` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `type` text COLLATE utf8_bin NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=14 ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `gt_raid_log`
+--
+
+DROP TABLE IF EXISTS `gt_raid_log`;
+CREATE TABLE IF NOT EXISTS `gt_raid_log` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `character_id` int(11) NOT NULL,
+  `raid_id` int(11) NOT NULL,
+  `state` text NOT NULL,
+  `message` text,
+  `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=50 ;
 
 -- --------------------------------------------------------
 

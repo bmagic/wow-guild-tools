@@ -1,0 +1,83 @@
+<h3>{{raid.name}}</h3>
+<div class="row">
+    <div class="col-md-2">
+        <h4 class="icon tank">Tanks</h4>
+        <div ng-repeat="character in allRaidCharacters | filterBy: ['main + role']: '1 tank'" >
+            <div ng-class="{'text-success' : inscriptionsByCharacterId[character.id].state == 'ok',
+            'text-danger' : inscriptionsByCharacterId[character.id].state == 'ko',
+            'text-warning' : inscriptionsByCharacterId[character.id].state == 'late'}">
+                <span class="icon class-{{character.class}}"></span>{{character.name}}
+                <span class="glyphicon" ng-class="{'glyphicon-ok' : inscriptionsByCharacterId[character.id].state == 'ok',
+                'glyphicon-exclamation-sign' : inscriptionsByCharacterId[character.id].state == 'ko',
+                'glyphicon-time' : inscriptionsByCharacterId[character.id].state == 'late'}"></span>
+            </div>
+        </div>
+        <h4 class="icon healing">Heal</h4>
+        <div ng-repeat="character in allRaidCharacters | filterBy: ['main + role']: '1 healing'" >
+            <div ng-class="{'text-success' : inscriptionsByCharacterId[character.id].state == 'ok',
+            'text-danger' : inscriptionsByCharacterId[character.id].state == 'ko',
+            'text-warning' : inscriptionsByCharacterId[character.id].state == 'late'}">
+                <span class="icon class-{{character.class}}"></span>{{character.name}}
+                <span class="glyphicon" ng-class="{'glyphicon-ok' : inscriptionsByCharacterId[character.id].state == 'ok',
+                'glyphicon-exclamation-sign' : inscriptionsByCharacterId[character.id].state == 'ko',
+                'glyphicon-time' : inscriptionsByCharacterId[character.id].state == 'late'}"></span>
+            </div>
+        </div>
+        <h4 class="icon dps">DPS</h4>
+        <div ng-repeat="character in allRaidCharacters | filterBy: ['main + role']: '1 dps'" >
+            <div ng-class="{'text-success' : inscriptionsByCharacterId[character.id].state == 'ok',
+            'text-danger' : inscriptionsByCharacterId[character.id].state == 'ko',
+            'text-warning' : inscriptionsByCharacterId[character.id].state == 'late'}">
+                <span class="icon class-{{character.class}}"></span>{{character.name}}
+                <span class="glyphicon" ng-class="{'glyphicon-ok' : inscriptionsByCharacterId[character.id].state == 'ok',
+                'glyphicon-exclamation-sign' : inscriptionsByCharacterId[character.id].state == 'ko',
+                'glyphicon-time' : inscriptionsByCharacterId[character.id].state == 'late'}"></span>
+
+            </div>
+        </div>
+    </div>
+    <div class="col-md-10">
+        <div class="row">
+            <div class="col-md-4">
+                <h3>Inscription</h3>
+                <form ng-if="role != 'casu'" ng-submit="addInscription(inscriptionState,inscriptionMessage)">
+                    <div class="form-group">
+                        <span class="icon class-{{mainCharacter.class}}">{{mainCharacter.name}}</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="radio-inline">
+                            <input ng-model="inscriptionState" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="ok"> Présent
+                        </label>
+                        <label class="radio-inline">
+                            <input ng-model="inscriptionState" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="ko"> Absent
+                        </label>
+                        <label class="radio-inline">
+                            <input ng-model="inscriptionState" type="radio" name="inlineRadioOptions" id="inlineRadio3" value="late"> Retard
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <textarea maxlength="250" placeholder="Un petit message ici éventuellement" ng-model="inscriptionMessage" class="form-control"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-default">Envoyer</button>
+                </form>
+                <div ng-if="role == 'casu'">Vous ne pouvez pas participer à ce raid. Demandez à intégrer le roster sur le forum.</div>
+            </div>
+            <div class="col-md-8">
+                <h3>Logs</h3>
+                <div ng-repeat="raidLog in raidLogs">
+                    <div ng-class="{'text-success' : raidLog.state == 'ok','text-danger' : raidLog.state == 'ko','text-warning' : raidLog.state == 'late'}">
+                        <span class="glyphicon" ng-class="{'glyphicon-ok' : raidLog.state == 'ok','glyphicon-exclamation-sign' : raidLog.state == 'ko','glyphicon-time' : raidLog.state == 'late'}"></span>
+                        <em>{{raidLog.date | amDateFormat:'DD/MM HH:mm:ss'}}</em> -
+                        <span>{{charactersById[raidLog.character_id].name}} </span>
+                        <span ng-if="raidLog.message.length>0">: {{raidLog.message}}</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
