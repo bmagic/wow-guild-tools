@@ -5,39 +5,47 @@
 
     <div class="row">
         <div class="col-md-2">
-            <form ng-submit="characterSubmit()">
-                <div class="form-group">
-                    <input type="text" placeholder="Nom du personnage" ng-model="characterName" class="form-control">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Ajouter un personnage</h3>
                 </div>
-                <div class="form-group">
-                    <input type="text" placeholder="Serveur" ng-model="characterRealm" class="form-control">
+                <div class="panel-body">
+                    <form ng-submit="characterSubmit()">
+                        <div class="form-group">
+                            <input type="text" placeholder="Nom du personnage" ng-model="characterName" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" placeholder="Serveur" ng-model="characterRealm" class="form-control">
+                        </div>
+                        <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Ajouter</button>
+                    </form>
                 </div>
-                <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Ajouter</button>
-            </form>
+            </div>
         </div>
         <div class="col-md-10">
-            <div class="characters-list">
-
-                <div class="row" ng-repeat="character in characters" ng-class="{ 'last' : $last}">
-                    <div class="col-md-1">
-                        <img src="{{armoryBaseUrl}}static-render/eu/{{character.thumbnail}}" />
-                    </div>
-                    <div class="col-md-3">
-                        <div>
-                            <span ng-if="character.main == 0"><strong>Reroll</strong></span>
-                            <span ng-if="character.main == 1"><strong>Main</strong></span>
-                            <span class="icon {{character.role | lowercase}}"></span>
+            <div class="characters-list panel panel-default">
+                <div class="panel-body">
+                    <div class="row" ng-repeat="character in characters" ng-class="{ 'last' : $last}">
+                        <div class="col-md-1">
+                            <img src="{{armoryBaseUrl}}static-render/eu/{{character.thumbnail}}" />
                         </div>
-                        <div><span class="icon class-{{character.class}}">{{character.name}}</span> - <em>lvl {{character.level}}</em> - <em>{{character.realm}}</em></div>
+                        <div class="col-md-3">
+                            <div>
+                                <span ng-if="character.main == 0"><strong>Reroll</strong></span>
+                                <span ng-if="character.main == 1"><strong>Main</strong></span>
+                                <span class="icon {{character.role | lowercase}}"></span>
+                            </div>
+                            <div><span class="icon class-{{character.class}}">{{character.name}}</span> - <em>lvl {{character.level}}</em> - <em>{{character.realm}}</em></div>
 
-                        <div>ilvl {{character.ilvl}} <span am-time-ago="character.last_update"></span> </div>
-                        <div class="icon armory"><a target="_blank" href="{{armoryBaseUrl}}wow/fr/character/{{character.realm}}/{{character.name}}/advanced">Voir sur l'armory</a></div>
-                    </div>
-                    <div class="actions col-md-8">
-                        <div><span ng-click="setCharacterRole('DPS',character)" class="pointer icon dps">DPS</span> <span ng-click="setCharacterRole('HEALING',character)" class="pointer icon healing">Heal</span> <span ng-click="setCharacterRole('TANK',character)" class="pointer icon tank">Tank</span></div>
-                        <div class="pointer" ng-click="updateCharacter(character)"><span class="glyphicon glyphicon-refresh"></span> Mettre à jour</div>
-                        <div class="pointer" ng-click="setMainCharacter(character)" ng-if="character.main == 0"><span class="glyphicon glyphicon-asterisk"></span> Personnage principal</div>
-                        <div class="pointer" ng-if="character.main == 0" ng-click="deleteCharacter(character)"><span class="glyphicon glyphicon-remove"></span> Supprimer</div>
+                            <div>ilvl {{character.ilvl}} <span am-time-ago="character.last_update"></span> </div>
+                            <div class="icon armory"><a target="_blank" href="{{armoryBaseUrl}}wow/fr/character/{{character.realm}}/{{character.name}}/advanced">Voir sur l'armory</a></div>
+                        </div>
+                        <div class="actions col-md-3">
+                            <div><span ng-click="setCharacterRole('DPS',character)" class="pointer icon dps">DPS</span> <span ng-click="setCharacterRole('HEALING',character)" class="pointer icon healing">Heal</span> <span ng-click="setCharacterRole('TANK',character)" class="pointer icon tank">Tank</span></div>
+                            <div class="pointer" ng-click="updateCharacter(character)"><span class="glyphicon glyphicon-refresh"></span> Mettre à jour</div>
+                            <div class="pointer" ng-click="setMainCharacter(character)" ng-if="character.main == 0"><span class="glyphicon glyphicon-asterisk"></span> Personnage principal</div>
+                            <div class="pointer" ng-if="character.main == 0" ng-click="deleteCharacter(character)"><span class="glyphicon glyphicon-remove"></span> Supprimer</div>
+                        </div>
                     </div>
                 </div>
 

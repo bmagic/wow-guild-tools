@@ -1,12 +1,11 @@
-body {    background-color: #eee; padding: 40px 0}
-
+body {    background-color: #5677A0; padding: 40px 0;font-family: 'Open Sans', sans-serif;}
 .logo-small{  background: url('../images/logo-small.png') no-repeat 10px center; padding-left:35px;}
 
 .navbar-right .dropdown{cursor:pointer}
 .pointer{cursor:pointer;}
 .pointer:hover{opacity: 0.9}
 
-
+h1 {color:#fff;}
 
 .loading .logo-small{
 -webkit-animation-name: rotate;
@@ -41,7 +40,7 @@ body {    background-color: #eee; padding: 40px 0}
 /* Rogue */
 .class-4{color:#FFF569}
 /* Priest */
-.class-5{color:#FFFFFF;}
+.class-5{color:#bbb;}
 /* Death Knight */
 .class-6{color:#C41F3B }
 /* Shaman */
@@ -97,11 +96,14 @@ body {    background-color: #eee; padding: 40px 0}
 .dashboard .display-jh li.jh {display:block}
 .dashboard .mmo {background: url('../images/mmo.png') left center no-repeat;}
 .dashboard .jh {background: url('../images/jh.png') left center no-repeat;}
-.dashboard .feed-selector {position:absolute; right:10px;top:0px;}
+.dashboard .feed-selector {position:absolute; right:20px;top:3px;}
 .dashboard .feed-selector span {background-position: center center;text-indent: -9999px;width:50px;}
 
 .dashboard .chat ul {padding-left:0px; list-style: none}
-.dashboard .chat .form .btn {width:100%}
+
+.dashboard .chat .form-group,
+.dashboard .chat input,
+.dashboard .chat button{width:100%}
 
 .dashboard .raidlog{text-overflow: ellipsis;overflow: hidden;  white-space: nowrap;}
 

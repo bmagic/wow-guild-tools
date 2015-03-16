@@ -118,6 +118,7 @@ guildtoolsApp.controller('MainController', ['$scope', 'socket','$location','ARMO
         });
 
         $scope.orderCharactersByName = orderCharactersByName;
+        $scope.charactersByUid = orderCharacters;
         $scope.allRaidCharacters = allRaidCharacters;
         $scope.charactersById =  charactersById;
 
@@ -273,6 +274,7 @@ guildtoolsApp.controller('CharactersController', ['$scope', 'socket',function($s
 guildtoolsApp.controller('RosterController', ['$scope', 'socket',function($scope,socket){
 
     socket.emit('get:all-characters');
+    $scope.showReroll = false;
 
     $scope.updateAllCharacters = function(){
         angular.element('body').addClass('loading');

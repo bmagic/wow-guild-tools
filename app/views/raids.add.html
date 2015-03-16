@@ -1,29 +1,35 @@
 <div class="add-raid">
-    <h3>Ajouter un raid</h3>
-    <form ng-if="role == 'officier'" ng-submit="raidSubmit()">
-        <div class="form-group">
-            <input maxlength="250" required type="text" placeholder="[Instance] Nom du raid" ng-model="raidName" class="form-control">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Ajouter un raid</h3>
         </div>
-        <div class="form-group">
-            <select required ng-model="raidType" class="form-control">
-                <option value="guild">Raideurs uniquement</option>
-                <!--option value="open">Ouvert à tous</option-->
-            </select>
-        </div>
-        <div class="form-group">
-            <div class="dropdown">
-                <a class="dropdown-toggle" id="dLabel" role="button" data-toggle="dropdown" data-target="#" href="">
-                    {{raidDate | amDateFormat:'DD/MM/YYYY HH:mm'}}
-                </a>
-                <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-                    <datetimepicker data-ng-model="raidDate"
-                                    data-datetimepicker-config="{ dropdownSelector: '.dropdown-toggle' }"></datetimepicker>
-                </ul>
+        <div class="panel-body">
+            <form ng-if="role == 'officier'" ng-submit="raidSubmit()">
+                <div class="form-group">
+                    <input maxlength="250" required type="text" placeholder="[Instance] Nom du raid" ng-model="raidName" class="form-control">
+                </div>
+                <div class="form-group">
+                    <select required ng-model="raidType" class="form-control">
+                        <option value="guild">Raideurs uniquement</option>
+                        <!--option value="open">Ouvert à tous</option-->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <div class="dropdown">
+                        Date & heure :
+                        <a class="dropdown-toggle" id="dLabel" role="button" data-toggle="dropdown" data-target="#" href="">
+                            {{raidDate | amDateFormat:'DD/MM/YYYY HH:mm'}}
+                        </a>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                            <datetimepicker data-ng-model="raidDate" data-datetimepicker-config="{ dropdownSelector: '.dropdown-toggle' }"></datetimepicker>
+                        </ul>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-default">Valider</button>
+            </form>
+            <div ng-if="role != 'officier'">
+                L'ajout de raid est pour le moment réservé aux officiers, les raids ouverts arrivent bientôt, vous pourrez tous proposer des raids.
             </div>
         </div>
-        <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Ajouter</button>
-    </form>
-    <div ng-if="role != 'officier'">
-        L'ajout de raid est pour le moment réservé aux officiers, les raids ouverts arrivent bientôt, vous pourrez tous proposer des raids.
     </div>
 </div>

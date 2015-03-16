@@ -1,18 +1,31 @@
 <div class="raids">
+    <h1>Raids</h1>
+
     <div class="row">
         <div class="col-md-2">
-            <h1>Raids</h1>
-            <h3>Prochains raids</h3>
-            <div ng-repeat="raid in nextRaids" >
-                <a href="#/raids/raid/{{raid.type}}/{{raid.id}}"><b>{{raid.date | amDateFormat:'dddd Do MMMM '}}</b> - {{raid.name}}</a>
-            </div>
-            <div ng-show="nextRaids.length==0">
-                Aucun raids à venir ...
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Prochains raids</h3>
+                </div>
+                <div class="panel-body">
+                    <div ng-repeat="raid in nextRaids" >
+                        <a href="#/raids/raid/{{raid.type}}/{{raid.id}}"><b>{{raid.date | amDateFormat:'dddd Do MMMM '}}</b> - {{raid.name}}</a>
+                    </div>
+                    <div ng-show="nextRaids.length==0">
+                        Aucun raids à venir ...
+                    </div>
+                    <div>
+
+                    </div>
+
+                </div>
+                <div class="panel-footer">
+                    <a href="#/raids/add" ><span class="glyphicon glyphicon-plus"></span> Ajouter un raid</a>
+                </div>
             </div>
         </div>
         <div class="col-md-10">
             <div ui-view>
-                <a href="#/raids/add" ><span class="glyphicon glyphicon-plus"></span> Ajouter un raid</a>
 
             </div>
         </div>
