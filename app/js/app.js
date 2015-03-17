@@ -26,11 +26,15 @@ guildtoolsApp.config(function($stateProvider, $urlRouterProvider) {
             templateUrl: "views/raids.add.html",
             controller: "RaidAddController"
         })
+        .state('/raids.edit', {
+            url: "/raid/edit/:raidId",
+            templateUrl: "views/raids.edit.html",
+            controller: "RaidEditController"
+        })
         .state('/raids.guild', {
             url: "/raid/guild/:raidId",
             templateUrl: "views/raids.guild.html",
             controller: "RaidGuildController"
-
         })
         .state('/personnages', {
             url: "/personnages",
@@ -71,7 +75,8 @@ guildtoolsApp.controller('MainController', ['$scope', 'socket','$location','ARMO
     });
 
     socket.on('set:message',function(message){
-        socket.emit('get:messages');
+        //socket.emit('get:messages');
+        $scope.messages.push(message);
     });
 
     socket.on('get:characters', function(characters){
@@ -170,14 +175,21 @@ guildtoolsApp.controller('MainController', ['$scope', 'socket','$location','ARMO
         $scope.nextRaids = nextRaids;
     });
 
-    socket.on('set:raid', function(nextRaids) {
+    socket.on('add:raid', function(raid) {
         angular.element('body').removeClass('loading');
-
-        $scope.raidName = '';
-        $scope.raidDate = Date().toString();
-        $scope.raidType = 'guild';
         socket.emit('get:next-raids');
+        $location.path('/raids/raid/'+raid.type+'/'+raid.id);
+        $location.replace();
+
     });
+
+    socket.on('update:raid', function(raid) {
+        angular.element('body').removeClass('loading');
+        socket.emit('get:next-raids');
+        $location.path('/raids/raid/'+raid.type+'/'+raid.id);
+        $location.replace();
+    });
+
     socket.on('get:raid', function(raids) {
         if (raids.length == 0){
             $location.path('/raids');
@@ -199,6 +211,11 @@ guildtoolsApp.controller('MainController', ['$scope', 'socket','$location','ARMO
     socket.on('add:inscription',function(raidId){
         socket.emit('get:inscriptions',raidId);
         socket.emit('get:raid-logs',raidId);
+    });
+    socket.on('delete:raid',function(raidId){
+        socket.emit('get:next-raids');
+        $location.path('/raids');
+        $location.replace();
     });
 
 
@@ -292,14 +309,26 @@ guildtoolsApp.controller('RaidAddController', ['$scope', 'socket',function($scop
     $scope.raidName = '';
     $scope.raidDate = Date().toString();
     $scope.raidType = 'guild';
+    $scope.raidDescription = '';
 
-    $scope.raidSubmit = function(){
+    $scope.raidSubmit = function(raidName,raidDate,raidType,raidDescription){
         angular.element('body').addClass('loading');
-        socket.emit('set:raid',{'name':$scope.raidName,'date':$scope.raidDate,'type':$scope.raidType})
-
+        socket.emit('add:raid',{'name':raidName,'date':raidDate,'type':raidType,'description':raidDescription})
     }
 
 
+
+}]);
+
+guildtoolsApp.controller('RaidEditController', ['$scope', 'socket','$stateParams',function($scope,socket,$stateParams){
+
+    socket.emit('get:raid',$stateParams.raidId);
+
+    $scope.raidSubmit = function(raidId,raidName,raidDate,raidType,raidDescription){
+
+        angular.element('body').addClass('loading');
+        socket.emit('update:raid',{'id':raidId,'name':raidName,'date':raidDate,'type':raidType,'description':raidDescription})
+    }
 
 }]);
 
@@ -314,6 +343,9 @@ guildtoolsApp.controller('RaidGuildController', ['$scope', 'socket','$stateParam
     socket.emit('get:raid-logs',$stateParams.raidId);
 
 
+    $scope.deleteRaid = function(raidId){
+        socket.emit('delete:raid',raidId);
+    };
 
     $scope.addInscription = function(inscriptionState,inscriptionMessage){
         socket.emit('add:inscription',{'raid_id':$stateParams.raidId,'state':inscriptionState,'character_id':$scope.mainCharacter.id,'message':inscriptionMessage});

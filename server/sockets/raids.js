@@ -9,8 +9,25 @@ module.exports = function(config,io,connection) {
         });
 
         socket.on('add:raid', function(obj){
-            addRaid(obj,function(){
-                socket.emit('add:raid');
+            addRaid(obj,function(result){
+                socket.emit('add:raid',{'id':result.insertId,'type':obj.type});
+            });
+        });
+        socket.on('update:raid', function(obj){
+            getRaid(obj.id, function(raid){
+                if (socket.request.user.uid != raid.uid && socket.request.user.role != 'officier'){
+                    socket.emit('error','Vous n\'avez pas les permissions de modifier ce raid');
+                    return;
+                }
+                updateRaid(obj,function(raid){
+                    socket.emit('update:raid',obj);
+                });
+            });
+
+        });
+        socket.on('delete:raid', function(raidId){
+            deleteRaid(raidId,function(){
+                socket.emit('delete:raid');
             });
         });
 
@@ -25,9 +42,9 @@ module.exports = function(config,io,connection) {
             });
         });
         socket.on('add:inscription', function(obj){
-                addUpdateInscription(obj,function(){
-                    socket.emit('add:inscription',obj.raid_id);
-                });
+            addUpdateInscription(obj,function(){
+                socket.emit('add:inscription',obj.raid_id);
+            });
         });
         socket.on('get:raid-logs', function(raidId){
             getRaidLogs(raidId,function(raidLogs){
@@ -35,8 +52,9 @@ module.exports = function(config,io,connection) {
             });
         });
 
+
         function getNextRaids(callback){
-            var sql = "SELECT * FROM gt_raid WHERE date > NOW()";
+            var sql = "SELECT * FROM gt_raid WHERE date > NOW() ORDER BY date";
             connection.query(sql, function (err, raids, fields) {
                 if (err) return console.log(err);
                 callback(raids);
@@ -44,15 +62,44 @@ module.exports = function(config,io,connection) {
         }
 
         function addRaid(obj,callback){
-            var sql = "INSERT INTO gt_raid(uid, name, date, type) "+
+            var time = new Date(obj.date).getTime();
+
+
+            var sql = "INSERT INTO gt_raid(uid, name, description, date, type) "+
                 "VALUES("+connection.escape(socket.request.user.uid)+", " +
                 connection.escape(obj.name)+", " +
-                connection.escape(obj.date)+", " +
+                connection.escape(obj.description)+", " +
+                "FROM_UNIXTIME("+connection.escape(time/1000) +"), " +
                 connection.escape(obj.type)+")";
             connection.query(sql, function (err, rows, fields) {
                 if (err) return console.log(err);
                 callback(rows);
             });
+        }
+        function updateRaid(obj,callback){
+            var time = new Date(obj.date).getTime();
+            var sql = "UPDATE gt_raid SET name = " + connection.escape(obj.name) + ", " +
+                "description = " + connection.escape(obj.description) + ", " +
+                "date = FROM_UNIXTIME("+connection.escape(time/1000) +") " +
+                "WHERE id=" + connection.escape(obj.id);
+
+            connection.query(sql, function (err, raid, fields) {
+                if (err) return console.log(err);
+                callback(raid);
+            });
+        }
+
+        function deleteRaid(raidId,callback){
+
+            if (socket.request.user.role == 'officier')
+                var sql = "DELETE FROM gt_raid WHERE id=" + connection.escape(raidId);
+            else
+                var sql = "DELETE FROM gt_raid WHERE id=" + connection.escape(raidId) +" AND uid="+socket.request.user.uid;
+            connection.query(sql, function (err, row, fields) {
+                if (err) return console.log(err);
+                callback();
+            });
+
         }
 
         function getRaid(id,callback){
@@ -87,7 +134,11 @@ module.exports = function(config,io,connection) {
                 }
                 else
                 {
-                    //Update current inscription
+                    if (inscription[0].state == obj.state){
+                        return;
+                    }
+
+
                     var sql = "UPDATE gt_inscription SET character_id = " + connection.escape(obj.character_id) + ", " +
                         "state = " + connection.escape(obj.state) + " " +
                         "WHERE uid=" + connection.escape(socket.request.user.uid) +" " +

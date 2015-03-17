@@ -92,8 +92,10 @@
                     <h3 class="panel-title">Prochains raids</h3>
                 </div>
                 <div class="panel-body">
-                    <div ng-repeat="raid in nextRaids" >
-                        <a href="#/raids/raid/{{raid.type}}/{{raid.id}}"><b>-{{raid.date | amDateFormat:'dddd Do MMMM'}}-</b><br/>{{raid.name}}</a>
+                    <div class="raid" ng-class="{ 'last' : $last}" ng-repeat="raid in nextRaids" >
+                        <a href="#/raids/raid/{{raid.type}}/{{raid.id}}"><div class="date">{{raid.date | amDateFormat:'dddd Do MMMM - HH:mm'}}</div>
+                            <div>{{raid.name}}</div>
+                        </a>
                     </div>
                     <div ng-show="nextRaids.length==0">
                         Aucun raids à venir ...

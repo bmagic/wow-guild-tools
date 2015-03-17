@@ -99,7 +99,7 @@ h1 {color:#fff;}
 .dashboard .feed-selector {position:absolute; right:20px;top:3px;}
 .dashboard .feed-selector span {background-position: center center;text-indent: -9999px;width:50px;}
 
-.dashboard .chat ul {padding-left:0px; list-style: none}
+.dashboard .chat ul {padding-left:0px; list-style: none;overflow-x: hidden;overflow-y: scroll;  max-height: 565px;}
 
 .dashboard .chat .form-group,
 .dashboard .chat input,
@@ -110,12 +110,11 @@ h1 {color:#fff;}
 .dashboard .character img {width:100%;max-width:128px;}
 .dashboard .character .col-md-4 {padding-right:0px;}
 
+
 /** Personnages **/
 .characters .alert {display:none;}
 .characters .characters-list .row { margin-bottom:20px; border-bottom:1px solid #ddd;padding-bottom: 20px;}
 .characters .characters-list .row.last { border:none;}
-
-.characters .characters-list .row img { float:right;}
 
 
 
@@ -126,4 +125,10 @@ h1 {color:#fff;}
 .roster .group-character, .roster .roster-character{margin-bottom:5px; border-bottom:1px solid #ddd;padding-bottom: 5px;}
 .roster .group-character.last, .roster .roster-character.last{border:none;}
 .roster button {float:right}
+
+/** Raids **/
+.raids .raid .date {text-transform: capitalize;font-weight: bold}
+.raids .raid {margin-bottom:5px; border-bottom:1px solid #ddd;padding-bottom: 5px;}
+.raids .raid.last {border:none;margin-bottom:0px;}
+.raids .panel-heading div {float:right;}
 

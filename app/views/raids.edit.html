@@ -1,0 +1,35 @@
+<div class="add-raid">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Editer</h3>
+        </div>
+        <div class="panel-body">
+            <form ng-submit="raidSubmit(raid.id,raid.name,raid.date,raid.type,raid.description)">
+                <div class="form-group">
+                    <input maxlength="250" required type="text" placeholder="[Instance] Nom du raid" ng-model="raid.name" class="form-control">
+                </div>
+                <div class="form-group">
+                    <select required ng-model="raid.type" class="form-control">
+                        <option value="guild">Raideurs uniquement</option>
+                        <!--option value="open">Ouvert à tous</option-->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <div class="dropdown">
+                        Date & heure :
+                        <a class="dropdown-toggle" id="dLabel" role="button" data-toggle="dropdown" data-target="#" href="">
+                            {{raid.date | amDateFormat:'DD/MM/YYYY HH:mm'}}
+                        </a>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                            <datetimepicker data-ng-model="raid.date" data-datetimepicker-config="{ dropdownSelector: '.dropdown-toggle' }"></datetimepicker>
+                        </ul>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <textarea maxlength="500" placeholder="Description du raid" rows="5" ng-model="raid.description" class="form-control"></textarea>
+                </div>
+                <button type="submit" class="btn btn-default">Valider</button>
+            </form>
+        </div>
+    </div>
+</div>

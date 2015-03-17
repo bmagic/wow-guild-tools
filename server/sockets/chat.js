@@ -1,7 +1,7 @@
 module.exports = function(config,io,connection){
     io.on('connection', function(socket){
         socket.on('get:messages', function() {
-            connection.query('SELECT * from `gt_message` ORDER BY `date` DESC LIMIT 28', function (err, rows, fields) {
+            connection.query('SELECT * from `gt_message` WHERE date > DATE_SUB(NOW(), INTERVAL 24 HOUR) ORDER BY `date` DESC', function (err, rows, fields) {
                 if (err) return console.log(err);
                 socket.emit('get:messages', rows.reverse());
             });
