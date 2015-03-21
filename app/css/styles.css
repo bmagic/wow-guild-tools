@@ -1,6 +1,8 @@
 body {    background-color: #5677A0; padding: 40px 0;font-family: 'Open Sans', sans-serif;}
 .logo-small{  background: url('../images/logo-small.png') no-repeat 10px center; padding-left:35px;}
 
+.nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
+
 .navbar-right .dropdown{cursor:pointer}
 .pointer{cursor:pointer;}
 .pointer:hover{opacity: 0.9}
@@ -130,5 +132,9 @@ h1 {color:#fff;}
 .raids .raid .date {text-transform: capitalize;font-weight: bold}
 .raids .raid {margin-bottom:5px; border-bottom:1px solid #ddd;padding-bottom: 5px;}
 .raids .raid.last {border:none;margin-bottom:0px;}
-.raids .panel-heading div {float:right;}
+.raids .panel-heading div,.raids .remove {float:right;}
 
+.raids .compositor div{ -webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;}
+.raids .as-sortable-placeholder{border:1px dashed darkgrey;box-sizing:border-box;background-color:#dbdbdb}
+.raids .compositor-group { min-height: 20px;border:1px solid #eee; }
+.raids .compositor-group .icon {cursor:pointer;}

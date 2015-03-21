@@ -2,3 +2,4 @@ app/bower_components
 server/config/config.dev.json
 server/node_modules
 server/nohup.out
+app/data

@@ -16,12 +16,15 @@
   ],
   "dependencies": {
     "angular": "latest",
+    "angular-socket-io":"latest",
     "angular-ui-router": "latest",
     "bootstrap": "latest",
     "jquery": "latest",
     "angular-moment": "latest",
     "angular-scroll-glue": "latest",
     "angular-filter": "latest",
-    "angular-bootstrap-datetimepicker": "latest"
+    "angular-bootstrap-datetimepicker": "latest",
+    "angular-bootstrap":"latest",
+    "ng-sortable":"latest"
   }
 }

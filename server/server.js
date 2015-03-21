@@ -19,6 +19,7 @@ var sessionStore = require('express-mysql-session')
 var passportSocketIo = require("passport.socketio");
 var mysql = require('mysql');
 var bcrypt = require('bcrypt');
+var flash = require('connect-flash');
 
 
 
@@ -67,6 +68,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(flash());
 
 server.listen(3000);
 
@@ -102,8 +104,8 @@ app.get('/login',
 app.post('/login',
     passport.authenticate('form_auth', {
         successRedirect: '/',
-        failureRedirect: '/login.html'
-        //failureFlash: true
+        failureRedirect: '/login.html',
+        failureFlash: true
     })
 );
 

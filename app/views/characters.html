@@ -27,7 +27,7 @@
                 <div class="panel-body">
                     <div class="row" ng-repeat="character in characters" ng-class="{ 'last' : $last}">
                         <div class="col-md-1">
-                            <img src="{{armoryBaseUrl}}static-render/eu/{{character.thumbnail}}" />
+                            <img ng-src="/data/thumbnails/{{character.id}}.jpg" />
                         </div>
                         <div class="col-md-3">
                             <div>

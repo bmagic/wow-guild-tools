@@ -1,5 +1,9 @@
+var http = require('http');
 var https = require('https');
 var async = require('async');
+var fs = require('fs');
+
+
 
 module.exports = function(config,io,connection){
     io.on('connection', function(socket){
@@ -21,6 +25,7 @@ module.exports = function(config,io,connection){
                         socket.emit('add:character', {"status": "ko", "message": "Personnage introuvable"});
                     }
                     else {
+
                         var sql = "SELECT * FROM gt_character where `uid`="+connection.escape(socket.request.user.uid);
                         connection.query(sql, function(err, rows, fields) {
                             if (err) return console.log(err);
@@ -28,10 +33,16 @@ module.exports = function(config,io,connection){
                             if (rows.length == 0)
                                 main=1;
 
-                            if (json.talents.length == 1 || json.talents[0].selected == true)
+                            if (json.talents.length == 1 || json.talents[0].selected == true){
                                 var armory_role = json.talents[0].spec.role;
-                            else
+                                var spec = json.talents[0].spec.name;
+
+                            }
+                            else{
                                 var armory_role = json.talents[1].spec.role;
+                                var spec = json.talents[1].spec.name;
+
+                            }
 
 
                             var sql = "INSERT INTO gt_character SET uid = " + connection.escape(socket.request.user.uid) + ", " +
@@ -45,10 +56,14 @@ module.exports = function(config,io,connection){
                                 "thumbnail = " + connection.escape(json.thumbnail) + "," +
                                 "role = " + connection.escape("DPS") + "," +
                                 "armory_role = " + connection.escape(armory_role) + "," +
+                                "spec = " + connection.escape(spec) + "," +
 
                                 "ilvl = " + connection.escape(json.items.averageItemLevelEquipped);
                             connection.query(sql, function (err, result, fields) {
                                 if (err) return console.log(err);
+                                downloadImage(config.armory.baseurl+json.thumbnail, '../app/data/thumbnails/'+result.insertId+'.jpg', function(){
+                                    console.log('Done downloading image for character '+json.name);
+                                });
 
                                 setEnchant(result.insertId,json,function(){
                                     socket.emit('add:character', {"status": "ok"})
@@ -85,6 +100,16 @@ module.exports = function(config,io,connection){
             });
 
         }
+        function downloadImage(url, filename, callback){
+            console.log(url);
+            var file = fs.createWriteStream(filename);
+            http.get(url, function(res) {
+                res.pipe(file);
+                file.on('finish', function() {
+                    file.close(callback);
+                });
+            });
+        };
 
 
         function isset(obj, path) {
@@ -120,6 +145,7 @@ module.exports = function(config,io,connection){
 
             connection.query('DELETE from `gt_character` WHERE name='+connection.escape(character.name) + ' AND uid='+connection.escape(socket.request.user.uid), function(err, rows, fields) {
                 if (err) return console.log(err);
+                fs.unlinkSync('../app/data/thumbnails/'+character.id+'.jpg');
                 socket.emit('delete:character');
 
             });
@@ -165,15 +191,26 @@ module.exports = function(config,io,connection){
 
             console.log('update : '+id);
 
-            if (json.talents.length == 1 || json.talents[0].selected == true)
+
+            downloadImage(config.armory.baseurl+json.thumbnail, '../app/data/thumbnails/'+id+'.jpg', function(){
+                console.log('Done downloading image for character '+json.name);
+            });
+
+
+            if (json.talents.length == 1 || json.talents[0].selected == true){
                 var armory_role = json.talents[0].spec.role;
-            else
+                var spec = json.talents[0].spec.name;
+            }
+            else{
                 var armory_role = json.talents[1].spec.role;
+                var spec = json.talents[1].spec.name;
+            }
 
             var sql = "UPDATE `gt_character` SET level = " + connection.escape(json.level) + "," +
                 "thumbnail = " + connection.escape(json.thumbnail) + "," +
                 "ilvl = " + connection.escape(json.items.averageItemLevelEquipped) + "," +
                 "armory_role = " + connection.escape(armory_role) + "," +
+                "spec = " + connection.escape(spec) + "," +
                 "last_update = NOW()" +
                 " WHERE id=" + connection.escape(id);
 

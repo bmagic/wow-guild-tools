@@ -1,3 +1,4 @@
+
 guildtoolsApp.directive('ngConfirmClick', [
     function(){
         return {
@@ -13,4 +14,5 @@ guildtoolsApp.directive('ngConfirmClick', [
                 });
             }
         };
-    }])
+    }
+]);
