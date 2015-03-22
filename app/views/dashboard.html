@@ -80,9 +80,9 @@
                     <h3 class="panel-title">En ligne</h3>
                 </div>
                 <div class="panel-body">
-                    <ul>
-                        <li ng-repeat="onlineUser in onlineUsers | unique: 'uid'"><span class="class-{{onlineUser.class}}">{{onlineUser.username}}</span> <em>({{onlineUser.role}})</em></li>
-                    </ul>
+
+                       <div ng-repeat="onlineUser in onlineUsers | unique: 'uid'"><span class="class-{{onlineUser.class}}">{{onlineUser.username}}</span> <em>({{onlineUser.role}})</em></div>
+
                 </div>
             </div>
 
