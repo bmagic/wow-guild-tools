@@ -110,7 +110,6 @@ module.exports = function(config,io,connection){
                 items=items.concat([item])
             }
             async.each(items,function(item){
-                console.log(item)
                 var hasGemSlot = false
                 if (json.items[item].constructor === Object){ 
                     json.items[item].bonusLists.forEach(function(bonus) {
