@@ -390,7 +390,6 @@ guildtoolsApp.controller('RaidController', ['$scope', 'socket','$stateParams','$
 
     /** Functions **/
     $scope.addRaidInscription = function(inscriptionState,inscriptionMessage,inscriptionCharacterId){
-        console.log(inscriptionCharacterId);
         socket.emit('add:raid-inscription',{'raid_id':$stateParams.raidId,'state':inscriptionState,'character_id':inscriptionCharacterId,'message':inscriptionMessage});
     }
 
@@ -561,7 +560,6 @@ guildtoolsApp.controller('RaidController', ['$scope', 'socket','$stateParams','$
         catch (e){
             compositor = {};
             compositor.pool = allCharactersId;
-            console.log(allCharactersId);
         }
         return compositor;
 
