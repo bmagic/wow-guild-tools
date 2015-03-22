@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Client: localhost
--- Généré le: Dim 22 Mars 2015 à 00:44
+-- Généré le: Dim 22 Mars 2015 à 15:31
 -- Version du serveur: 5.5.41-0ubuntu0.14.04.1
 -- Version de PHP: 5.5.9-1ubuntu4.7
 
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS `gt_character` (
   `armory_role` text COLLATE utf8_bin NOT NULL,
   `last_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=133 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=135 ;
 
 -- --------------------------------------------------------
 
@@ -100,7 +100,7 @@ CREATE TABLE IF NOT EXISTS `gt_message` (
   `message` text CHARACTER SET latin1 NOT NULL,
   `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=2600 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=2763 ;
 
 -- --------------------------------------------------------
 
@@ -117,7 +117,7 @@ CREATE TABLE IF NOT EXISTS `gt_raid` (
   `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `type` text COLLATE utf8_bin NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=41 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=48 ;
 
 -- --------------------------------------------------------
 
@@ -134,7 +134,7 @@ CREATE TABLE IF NOT EXISTS `gt_raid_inscription` (
   `state` text COLLATE utf8_bin NOT NULL,
   PRIMARY KEY (`id`),
   KEY `raid_id` (`raid_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=59 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=69 ;
 
 -- --------------------------------------------------------
 
@@ -150,8 +150,9 @@ CREATE TABLE IF NOT EXISTS `gt_raid_log` (
   `state` text NOT NULL,
   `message` text,
   `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=128 ;
+  PRIMARY KEY (`id`),
+  KEY `raid_id` (`raid_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=161 ;
 
 -- --------------------------------------------------------
 
@@ -169,7 +170,7 @@ CREATE TABLE IF NOT EXISTS `gt_raid_tab` (
   PRIMARY KEY (`id`),
   KEY `raid_id` (`raid_id`),
   KEY `raid_id_2` (`raid_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=125 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=141 ;
 
 -- --------------------------------------------------------
 
@@ -207,6 +208,18 @@ CREATE TABLE IF NOT EXISTS `sessions` (
 --
 ALTER TABLE `gt_character_gear`
   ADD CONSTRAINT `gt_character_gear_ibfk_1` FOREIGN KEY (`character_id`) REFERENCES `gt_character` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+--
+-- Contraintes pour la table `gt_raid_inscription`
+--
+ALTER TABLE `gt_raid_inscription`
+  ADD CONSTRAINT `gt_raid_inscription_ibfk_1` FOREIGN KEY (`raid_id`) REFERENCES `gt_raid` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+--
+-- Contraintes pour la table `gt_raid_log`
+--
+ALTER TABLE `gt_raid_log`
+  ADD CONSTRAINT `gt_raid_log_ibfk_1` FOREIGN KEY (`raid_id`) REFERENCES `gt_raid` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
 --
 -- Contraintes pour la table `gt_raid_tab`

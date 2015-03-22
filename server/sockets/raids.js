@@ -21,7 +21,7 @@ module.exports = function(config,io,connection) {
         });
         socket.on('update:raid', function(obj){
             getRaid(obj.id, function(raid){
-                if (socket.request.user.uid != raid.uid && socket.request.user.role != 'officier'){
+                if (!(socket.request.user.uid == raid.uid || socket.request.user.role == 'officier')){
                     return;
                 }
                 updateRaid(obj,function(raid){
@@ -59,7 +59,7 @@ module.exports = function(config,io,connection) {
         socket.on('add:raid-tab', function(raidId){
 
             getRaid(raidId, function(raid){
-                if (socket.request.user.uid != raid.uid && socket.request.user.role != 'officier'){
+                if ( !(socket.request.user.uid == raid.uid || socket.request.user.role == 'officier')){
                     return;
                 }
                 addRaidTab(raidId,function(raidTab){
@@ -75,7 +75,7 @@ module.exports = function(config,io,connection) {
         socket.on('update:raid-tab', function(obj){
             getTab(obj.id,function (raidTab){
                 getRaid(raidTab.raid_id, function(raid){
-                    if (socket.request.user.uid != raid.uid && socket.request.user.role != 'officier'){
+                    if (!(socket.request.user.uid == raid.uid || socket.request.user.role == 'officier')){
                         return;
                     }
                     updateRaidTab(obj,function(){
@@ -176,16 +176,23 @@ module.exports = function(config,io,connection) {
 
                 if (inscription.length == 0 )
                 {
-                    //Add new inscription & set logs.
-                    var sql = "INSERT INTO gt_raid_inscription(uid, character_id, raid_id, state) "+
-                        "VALUES("+connection.escape(socket.request.user.uid)+", " +
-                        connection.escape(obj.character_id)+", " +
-                        connection.escape(obj.raid_id)+", " +
-                        connection.escape(obj.state)+")";
+
+                    connection.query('SELECT * from `gt_character` WHERE `uid`='+socket.request.user.uid+' AND id='+connection.escape(obj.character_id), function(err, characters, fields) {
+                        if (err) return console.log(err);
+
+                        if(characters.length == 0)
+                            return;
+                        //Add new inscription & set logs.
+                        var sql = "INSERT INTO gt_raid_inscription(uid, character_id, raid_id, state) " +
+                            "VALUES(" + connection.escape(socket.request.user.uid) + ", " +
+                            connection.escape(obj.character_id) + ", " +
+                            connection.escape(obj.raid_id) + ", " +
+                            connection.escape(obj.state) + ")";
+                    });
                 }
                 else
                 {
-                    if (inscription[0].state == obj.state){
+                    if (inscription[0].state == obj.state && inscription[0].character_id == obj.character_id ){
                         return;
                     }
 

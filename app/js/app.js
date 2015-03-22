@@ -34,7 +34,12 @@ guildtoolsApp.config(function($stateProvider, $urlRouterProvider) {
         .state('/raids.guild', {
             url: "/raid/guild/:raidId",
             templateUrl: "views/raids.guild.html",
-            controller: "RaidGuildController"
+            controller: "RaidController"
+        })
+        .state('/raids.open', {
+            url: "/raid/open/:raidId",
+            templateUrl: "views/raids.open.html",
+            controller: "RaidController"
         })
         .state('/personnages', {
             url: "/personnages",
@@ -60,6 +65,7 @@ guildtoolsApp.controller('MainController', ['$scope', 'socket','$location','$sta
     $scope.dps_cac = SPEC_DPS_LIST.dps_cac;
     $scope.armoryBaseUrl =ARMORY_BASEURL;
 
+
     socket.emit('get:user');
     socket.on('get:user', function(user){
         $scope.username = user.username;
@@ -70,20 +76,6 @@ guildtoolsApp.controller('MainController', ['$scope', 'socket','$location','$sta
 
     socket.on('get:online-users',function(onlineUsers){
         $scope.onlineUsers = onlineUsers;
-    });
-
-    socket.on('get:feeds', function(feeds){
-        $scope.feeds = feeds;
-    });
-
-    socket.on('get:messages', function(messages){
-        $scope.messages = messages;
-    });
-
-    socket.on('set:message',function(message){
-        //socket.emit('get:messages');
-        if ($scope.messages != undefined)
-            $scope.messages.push(message);
     });
 
     socket.on('get:characters', function(characters){
@@ -101,10 +93,6 @@ guildtoolsApp.controller('MainController', ['$scope', 'socket','$location','$sta
 
         $scope.characters = characters;
 
-    });
-
-    socket.on('get:raids-logs', function(raidsLogs){
-        $scope.raidsLogs=raidsLogs.reverse();
     });
 
     socket.on('get:all-characters', function(characters){
@@ -145,64 +133,8 @@ guildtoolsApp.controller('MainController', ['$scope', 'socket','$location','$sta
 
     });
 
-    socket.on('update:all-characters', function(obj) {
-        angular.element('body').removeClass('loading');
-        socket.emit('get:all-characters');
-    });
-
-    socket.on('add:character', function(obj){
-        angular.element('body').removeClass('loading');
-
-        if (obj.status == "ok"){
-            socket.emit('get:characters');
-            $scope.characterName= '';
-            $scope.characterRealm='';
-        }
-        else
-            angular.element('.alert').text(obj.message).show();
-    });
-
-    socket.on('delete:character', function(obj) {
-        angular.element('body').removeClass('loading');
-        socket.emit('get:characters');
-    });
-
-    socket.on('update:character', function(obj) {
-        angular.element('body').removeClass('loading');
-        if (obj.status == "ok"){
-            socket.emit('get:characters');
-        }
-        else
-            angular.element('.alert').text(obj.message).show();
-    });
-
-    socket.on('set:main-character', function(obj) {
-        angular.element('body').removeClass('loading');
-        socket.emit('get:characters');
-    });
-
-    socket.on('set:character-role', function(obj) {
-        angular.element('body').removeClass('loading');
-        socket.emit('get:characters');
-    });
-
     socket.on('get:next-raids', function(nextRaids) {
         $scope.nextRaids = nextRaids;
-    });
-
-    socket.on('add:raid', function(raid) {
-        angular.element('body').removeClass('loading');
-        socket.emit('get:next-raids');
-        $location.path('/raids/raid/'+raid.type+'/'+raid.id);
-        $location.replace();
-
-    });
-
-    socket.on('update:raid', function(raid) {
-        angular.element('body').removeClass('loading');
-        socket.emit('get:next-raids');
-        $location.path('/raids/raid/'+raid.type+'/'+raid.id);
-        $location.replace();
     });
 
     socket.on('get:raid', function(raids) {
@@ -213,27 +145,38 @@ guildtoolsApp.controller('MainController', ['$scope', 'socket','$location','$sta
         $scope.raid = raids[0];
     });
 
-
-
-
-
-
-
-
 }]);
 
 
 guildtoolsApp.controller('DashboardController', ['$scope', 'socket',function($scope,socket){
 
     socket.emit('get:feeds');
-
     socket.emit('get:messages');
-
     socket.emit('get:characters');
-
     socket.emit('get:raids-logs');
-
     socket.emit('get:next-raids');
+
+
+    socket.forward('get:feeds', $scope);
+    $scope.$on('socket:get:feeds',function(ev,feeds){
+        $scope.feeds = feeds;
+    });
+
+    socket.forward('get:messages', $scope);
+    $scope.$on('socket:get:messages',function(ev,messages){
+        $scope.messages = messages;
+    });
+
+    socket.forward('set:message', $scope);
+    $scope.$on('socket:set:message',function(ev,message){
+        if ($scope.messages != undefined)
+            $scope.messages.push(message);
+    });
+
+    socket.forward('get:raids-logs', $scope);
+    $scope.$on('socket:get:raids-logs', function(ev,raidsLogs){
+        $scope.raidsLogs=raidsLogs.reverse();
+    });
 
     $scope.chatSubmit = function(){
         if ($scope.text != ''){
@@ -253,6 +196,48 @@ guildtoolsApp.controller('CharactersController', ['$scope', 'socket',function($s
 
     //Load feeds
     socket.emit('get:characters');
+
+
+    socket.forward('add:character', $scope);
+    $scope.$on('socket:add:character', function(ev,obj){
+        angular.element('body').removeClass('loading');
+
+        if (obj.status == "ok"){
+            socket.emit('get:characters');
+            $scope.characterName= '';
+            $scope.characterRealm='';
+        }
+        else
+            angular.element('.alert').text(obj.message).show();
+    });
+
+    socket.forward('delete:character', $scope);
+    $scope.$on('socket:delete:character', function(ev,obj) {
+        angular.element('body').removeClass('loading');
+        socket.emit('get:characters');
+    });
+
+    socket.forward('update:character', $scope);
+    $scope.$on('socket:update:character', function(ev,obj) {
+        angular.element('body').removeClass('loading');
+        if (obj.status == "ok"){
+            socket.emit('get:characters');
+        }
+        else
+            angular.element('.alert').text(obj.message).show();
+    });
+
+    socket.forward('set:main-character', $scope);
+    $scope.$on('socket:set:main-character', function(ev,obj) {
+        angular.element('body').removeClass('loading');
+        socket.emit('get:characters');
+    });
+
+    socket.forward('set:character-role', $scope);
+    $scope.$on('socket:set:character-role', function(ev,obj) {
+        angular.element('body').removeClass('loading');
+        socket.emit('get:characters');
+    });
 
 
     $scope.characterSubmit = function(){
@@ -292,6 +277,13 @@ guildtoolsApp.controller('RosterController', ['$scope', 'socket',function($scope
     socket.emit('get:all-characters');
     $scope.showReroll = false;
 
+    socket.forward('update:all-characters', $scope);
+    $scope.$on('socket:update:all-characters', function(ev,obj) {
+        angular.element('body').removeClass('loading');
+        socket.emit('get:all-characters');
+    });
+
+
     $scope.updateAllCharacters = function(){
         angular.element('body').addClass('loading');
         socket.emit('update:all-characters');
@@ -310,11 +302,28 @@ guildtoolsApp.controller('RaidsController', ['$scope', 'socket',function($scope,
 
 
 }]);
-guildtoolsApp.controller('RaidAddController', ['$scope', 'socket',function($scope,socket){
+
+
+
+guildtoolsApp.controller('RaidAddController', ['$scope', 'socket','$location',function($scope,socket,$location){
     $scope.raidName = '';
     $scope.raidDate = Date().toString();
-    $scope.raidType = 'guild';
+
+    $scope.raidType = 'open';
+
+
     $scope.raidDescription = '';
+
+
+    socket.forward('add:raid', $scope);
+    $scope.$on('socket:add:raid', function(ev,raid) {
+        angular.element('body').removeClass('loading');
+        socket.emit('get:next-raids');
+        $location.path('/raids/raid/'+raid.type+'/'+raid.id);
+        $location.replace();
+
+    });
+
 
     $scope.raidSubmit = function(raidName,raidDate,raidType,raidDescription){
         angular.element('body').addClass('loading');
@@ -325,9 +334,17 @@ guildtoolsApp.controller('RaidAddController', ['$scope', 'socket',function($scop
 
 }]);
 
-guildtoolsApp.controller('RaidEditController', ['$scope', 'socket','$stateParams',function($scope,socket,$stateParams){
+guildtoolsApp.controller('RaidEditController', ['$scope', 'socket','$stateParams','$location',function($scope,socket,$stateParams,$location){
 
     socket.emit('get:raid',$stateParams.raidId);
+
+    socket.forward('update:raid', $scope);
+    $scope.$on('socket:update:raid', function(ev,raid) {
+        angular.element('body').removeClass('loading');
+        socket.emit('get:next-raids');
+        $location.path('/raids/raid/'+raid.type+'/'+raid.id);
+        $location.replace();
+    });
 
     $scope.raidSubmit = function(raidId,raidName,raidDate,raidType,raidDescription){
 
@@ -337,10 +354,11 @@ guildtoolsApp.controller('RaidEditController', ['$scope', 'socket','$stateParams
 
 }]);
 
-guildtoolsApp.controller('RaidGuildController', ['$scope', 'socket','$stateParams','$location',function($scope,socket,$stateParams,$location){
+guildtoolsApp.controller('RaidController', ['$scope', 'socket','$stateParams','$location',function($scope,socket,$stateParams,$location){
 
     $scope.inscriptionState = 'ok';
     $scope.inscriptionMessage = '';
+    $scope.inscriptionCharacterId = '';
 
 
     socket.emit('get:all-characters');
@@ -371,8 +389,9 @@ guildtoolsApp.controller('RaidGuildController', ['$scope', 'socket','$stateParam
 
 
     /** Functions **/
-    $scope.addRaidInscription = function(inscriptionState,inscriptionMessage){
-        socket.emit('add:raid-inscription',{'raid_id':$stateParams.raidId,'state':inscriptionState,'character_id':$scope.mainCharacter.id,'message':inscriptionMessage});
+    $scope.addRaidInscription = function(inscriptionState,inscriptionMessage,inscriptionCharacterId){
+        console.log(inscriptionCharacterId);
+        socket.emit('add:raid-inscription',{'raid_id':$stateParams.raidId,'state':inscriptionState,'character_id':inscriptionCharacterId,'message':inscriptionMessage});
     }
 
     $scope.addRaidTab = function(){
@@ -400,14 +419,24 @@ guildtoolsApp.controller('RaidGuildController', ['$scope', 'socket','$stateParam
         inscriptionsByRole.TANK =[];
         inscriptionsByRole.HEALING =[];
         inscriptionsByRole.DPS =[];
+
+        var allInscriptionsByRole = {};
+        allInscriptionsByRole.TANK =[];
+        allInscriptionsByRole.HEALING =[];
+        allInscriptionsByRole.DPS =[];
+
         inscriptions.forEach(function (inscription) {
             inscriptionsByCharacterId[inscription.character_id]=inscription;
+
+            allInscriptionsByRole[$scope.charactersById[inscription.character_id].role].push(inscription);
+
             if($scope.charactersById[inscription.character_id].main ==1 && inscription.state == 'ok')
                 inscriptionsByRole[$scope.charactersById[inscription.character_id].role].push(inscription);
         });
         $scope.inscriptionsByCharacterId = inscriptionsByCharacterId;
         $scope.inscriptionsByRole = inscriptionsByRole;
-
+        $scope.allInscriptionsByRole = allInscriptionsByRole;
+        $scope.allInscriptions = inscriptions;
 
     });
 
@@ -470,20 +499,21 @@ guildtoolsApp.controller('RaidGuildController', ['$scope', 'socket','$stateParam
     });
 
     $scope.parseCompositor = function(compositor){
-        var allRaidCharactersId =[];
-        $scope.allRaidCharacters.forEach(function(character){
-            allRaidCharactersId.push(character.id);
-
-        });
-
-
+        var allCharactersId =[];
+        if ($scope.raid.type == "guild") {
+            $scope.allRaidCharacters.forEach(function (character) {
+                allCharactersId.push(character.id);
+            });
+        }
+        else {
+             $scope.allInscriptions.forEach(function (inscription){
+                 allCharactersId.push(inscription.character_id);
+             });
+        }
         try {
-
-
-
             compositor = JSON.parse(compositor);
 
-            var newCharactersId = allRaidCharactersId;
+            var newCharactersId = allCharactersId;
 
 
             // TODO Voir pouquoi ça bug ...
@@ -530,8 +560,8 @@ guildtoolsApp.controller('RaidGuildController', ['$scope', 'socket','$stateParam
         }
         catch (e){
             compositor = {};
-            compositor.pool = allRaidCharactersId;
-            console.log(allRaidCharactersId);
+            compositor.pool = allCharactersId;
+            console.log(allCharactersId);
         }
         return compositor;
 

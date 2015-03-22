@@ -27,7 +27,7 @@
                 </div>
                 <div class="panel-body">
                     <div class="raid" ng-class="{ 'last' : $last}" ng-repeat="raid in prevRaids" >
-                        <a href="#/raids/raid/{{raid.type}}/{{raid.id}}"><div class="date"><span ng-if="raid.type =='guild'" class="glyphicon glyphicon-hand-right"></span> {{raid.date | amDateFormat:'dddd Do MMMM - HH:mm'}}</div>
+                        <a href="#/raids/raid/{{raid.type}}/{{raid.id}}"><div class="date"><span ng-if="raid.type =='guild'" class="glyphicon glyphicon-hand-right"></span> {{raid.date | amDateFormat:'dddd Do MMMM'}}</div>
                             <div>{{raid.name}}</div>
                         </a>
                     </div>
