@@ -65,7 +65,7 @@ module.exports = function(config,io,connection){
                                     console.log('Done downloading image for character '+json.name);
                                 });
 
-                                setEnchant(result.insertId,json,function(){
+                                setGear(result.insertId,json,function(){
                                     socket.emit('add:character', {"status": "ok"})
                                 });
 
@@ -78,37 +78,79 @@ module.exports = function(config,io,connection){
 
         });
 
+		function getGemName(gemid,values,callback){
+			if (!gemid) { 
+				callback(values.concat([false]));
+			} else {
+				getBattlenet(config.battlenet.baseurl+"item/"+gemid+"?locale=fr_FR&apikey="+config.battlenet.apikey,function(json) {
+					var Gem = false
+					if (isset(json,'gemInfo.bonus.name')) Gem = json.gemInfo.bonus.name
+					callback(values.concat([Gem]));
+				})
+			}
+		}
 
-        function setEnchant(id, json,callback){
-            var sql = "INSERT INTO gt_character_enchant(id, neck, back, finger1, finger2, mainHand) "+
-                "VALUES("+connection.escape(id)+", " +
-                connection.escape(!isset(json,'items.neck.tooltipParams.enchant')?0:json.items.neck.tooltipParams.enchant)+", " +
-                connection.escape(!isset(json,'items.back.tooltipParams.enchant')?0:json.items.back.tooltipParams.enchant)+", " +
-                connection.escape(!isset(json,'items.finger1.tooltipParams.enchant')?0:json.items.finger1.tooltipParams.enchant)+", " +
-                connection.escape(!isset(json,'items.finger2.tooltipParams.enchant')?0:json.items.finger2.tooltipParams.enchant)+", " +
-                connection.escape(!isset(json,'items.mainHand.tooltipParams.enchant')?0:json.items.mainHand.tooltipParams.enchant)+") " +
-                "ON DUPLICATE KEY UPDATE id="+connection.escape(id)+", "+
-                "neck="+connection.escape(!isset(json,'items.neck.tooltipParams.enchant')?0:json.items.neck.tooltipParams.enchant)+", "+
-                "back="+connection.escape(!isset(json,'items.back.tooltipParams.enchant')?0:json.items.back.tooltipParams.enchant)+", "+
-                "finger1="+connection.escape(!isset(json,'items.finger1.tooltipParams.enchant')?0:json.items.finger1.tooltipParams.enchant)+", "+
-                "finger2="+connection.escape(!isset(json,'items.finger2.tooltipParams.enchant')?0:json.items.finger2.tooltipParams.enchant)+", "+
-                "mainHand="+connection.escape(!isset(json,'items.mainHand.tooltipParams.enchant')?0:json.items.mainHand.tooltipParams.enchant);
+		function getEnchantName(enchantid,values,callback){
+			if (!enchantid) {
+				callback(values.concat([false]));
+			} else {
+				sql="SELECT name from gt_enchants where enchant_id = ?"
+				connection.query(sql, enchantid, function (err, result, fields) {
+	           		if (err) return console.log(err);
+					Enchant = "Unknown enchant " + enchantid
+					if (result.length != 0 && isset(result[0],'name')) Enchant = result[0].name
+					callback(values.concat([Enchant]));
+	            });
+			}
+		}
 
-            connection.query(sql, function (err, result, fields) {
-                if (err) return console.log(err);
-                callback();
-            });
+        function setGear(id, json, callback){
+			items=[]
+			for (var item in json.items){
+				items=items.concat([item])
+			}
+			async.each(items,function(item){
+				console.log(item)
+				var hasGemSlot = false
+				if (json.items[item].constructor === Object){ 
+					json.items[item].bonusLists.forEach(function(bonus) {
+						if ([563,564,565].indexOf(bonus) != -1) hasGemSlot = true
+					})
+					var isEnchanteable = false
+					if (['neck','back','finger1','finger2','mainHand','offHand'].indexOf(item) != -1) isEnchanteable = true
+	
+					var values = [id, item, json.items[item].id, json.items[item].itemLevel, hasGemSlot, isEnchanteable]
+					getGemName(!isset(json,'items.'+item+'.tooltipParams.gem0')?false:json.items[item].tooltipParams.gem0,values,function(values){
+						getEnchantName(!isset(json,'items.'+item+'.tooltipParams.enchant')?false:json.items[item].tooltipParams.enchant,values,function(values){
+				            var sql = "INSERT INTO gt_character_gear(character_id, slot, item_id, item_lvl, has_gem_slot, is_enchanteable, gem, enchant) " +
+				                "VALUES( ?, ?, ?, ?, ?, ?, ?, ? ) " +
+				                "ON DUPLICATE KEY UPDATE item_id = ?, item_lvl = ?, has_gem_slot = ?, is_enchanteable = ?, gem = ?, enchant = ?"
+							values = [].concat(values,values.slice(2))
+			            	connection.query(sql, values, function (err, result, fields) {
+				                if (err) return console.log(err);
+				            });
+						});
+					});
+				}
+			});
 
+			callback();
         }
+
         function downloadImage(url, filename, callback){
             console.log(url);
-            var file = fs.createWriteStream(filename);
-            http.get(url, function(res) {
-                res.pipe(file);
-                file.on('finish', function() {
-                    file.close(callback);
-                });
-            });
+			try {
+	            var file = fs.createWriteStream(filename);
+	            http.get(url, function(res) {
+	                res.pipe(file);
+	                file.on('finish', function() {
+	                    file.close(callback);
+	                });
+	            });
+			} catch(error) {
+                socket.emit('add:character', {"status": "ko", "message": "Impossible de récupérer l'image de profil"});
+				console.log('Problem getting profile image : ' + err)
+			}
         };
 
 
@@ -216,7 +258,7 @@ module.exports = function(config,io,connection){
 
             connection.query(sql, function (err, rows, fields) {
                 if (err) return console.log(err);
-                setEnchant(id,json,function(){
+                setGear(id,json,function(){
                     callback();
                 });
             });

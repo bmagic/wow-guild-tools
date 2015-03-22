@@ -26,8 +26,11 @@
   ],
   "battlenet": {
     "baseurl": "https://eu.api.battle.net/wow/",
-    "apikey": ""
+    "apikey": "<your_api_key>"
   },
-  "warcraftlogs_id":0
+  "armory": {
+i   "baseurl": "http://eu.battle.net/static-render/eu/"
+  }
+  "warcraftlogs_id": 0
 
 }
