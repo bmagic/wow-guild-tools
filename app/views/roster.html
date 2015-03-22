@@ -42,6 +42,7 @@
                                 <div class="roster-character {{character.urole}}" ng-class="{ 'last' : $last}">
                                     <a class="icon class-{{character.class}}" target="_blank" href="{{armoryBaseUrl}}wow/fr/character/{{character.realm}}/{{character.name}}/advanced">{{character.name}}</a> ({{character.ilvl}})
                                     <div ng-if="character.role == character.armory_role">
+                                        <div class="text-danger" ng-if="character.missing_gem == 1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Gemme manquante</em></div>
                                         <div class="text-danger" ng-if="character.neck == 0 || enchantsList.indexOf(character.neck) == -1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Enchantement cou</em></div>
                                         <div class="text-danger" ng-if="character.back == 0 || enchantsList.indexOf(character.back) == -1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Enchantement dos</em></div>
                                         <div class="text-danger" ng-if="character.finger1 == 0 || enchantsList.indexOf(character.finger1) == -1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Enchantement doigt 1</em></div>
@@ -58,6 +59,7 @@
                                 <div ng-class="{ 'last' : $last}" class="roster-character {{character.urole}}">
                                     <a class="icon class-{{character.class}}" target="_blank" href="{{armoryBaseUrl}}wow/fr/character/{{character.realm}}/{{character.name}}/advanced">{{character.name}}</a> ({{character.ilvl}})
                                     <div ng-if="character.role == character.armory_role">
+                                        <div class="text-danger" ng-if="character.missing_gem == 1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Gemme manquante</em></div>
                                         <div class="text-danger" ng-if="character.neck == 0 || enchantsList.indexOf(character.neck) == -1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Enchantement cou</em></div>
                                         <div class="text-danger" ng-if="character.back == 0 || enchantsList.indexOf(character.back) == -1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Enchantement dos</em></div>
                                         <div class="text-danger" ng-if="character.finger1 == 0 || enchantsList.indexOf(character.finger1) == -1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Enchantement doigt 1</em></div>
@@ -74,6 +76,7 @@
                                 <div ng-class="{ 'last' : $last}" class="roster-character {{character.urole}}">
                                     <a class="icon class-{{character.class}}" target="_blank" href="{{armoryBaseUrl}}wow/en/character/{{character.realm}}/{{character.name}}/advanced">{{character.name}}</a> ({{character.ilvl}})
                                     <div ng-if="character.role == character.armory_role">
+                                        <div class="text-danger" ng-if="character.missing_gem == 1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Gemme manquante</em></div>
                                         <div class="text-danger" ng-if="character.neck == 0 || enchantsList.indexOf(character.neck) == -1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Enchantement cou</em></div>
                                         <div class="text-danger" ng-if="character.back == 0 || enchantsList.indexOf(character.back) == -1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Enchantement dos</em></div>
                                         <div class="text-danger" ng-if="character.finger1 == 0 || enchantsList.indexOf(character.finger1) == -1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Enchantement doigt 1</em></div>
@@ -90,6 +93,7 @@
                                 <div ng-class="{ 'last' : $last}" class="roster-character {{character.urole}} ">
                                     <a class="icon class-{{character.class}}" target="_blank" href="{{armoryBaseUrl}}wow/en/character/{{character.realm}}/{{character.name}}/advanced">{{character.name}}</a> ({{character.ilvl}})
                                     <div ng-if="character.role == character.armory_role">
+                                        <div class="text-danger" ng-if="character.missing_gem == 1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Gemme manquante</em></div>
                                         <div class="text-danger" ng-if="character.neck == 0 || enchantsList.indexOf(character.neck) == -1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Enchantement cou</em></div>
                                         <div class="text-danger" ng-if="character.back == 0 || enchantsList.indexOf(character.back) == -1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Enchantement dos</em></div>
                                         <div class="text-danger" ng-if="character.finger1 == 0 || enchantsList.indexOf(character.finger1) == -1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Enchantement doigt 1</em></div>

@@ -120,14 +120,13 @@ module.exports = function(config,io,connection){
     
                     var values = [id, item, json.items[item].id, json.items[item].itemLevel, hasGemSlot, isEnchanteable]
                     getGemName(!isset(json,'items.'+item+'.tooltipParams.gem0')?false:json.items[item].tooltipParams.gem0,values,function(values){
-                        getEnchantName(!isset(json,'items.'+item+'.tooltipParams.enchant')?false:json.items[item].tooltipParams.enchant,values,function(values){
-                            var sql = "INSERT INTO gt_character_gear(character_id, slot, item_id, item_lvl, has_gem_slot, is_enchanteable, gem, enchant) " +
-                                "VALUES( ?, ?, ?, ?, ?, ?, ?, ? ) " +
-                                "ON DUPLICATE KEY UPDATE item_id = ?, item_lvl = ?, has_gem_slot = ?, is_enchanteable = ?, gem = ?, enchant = ?"
-                            values = [].concat(values,values.slice(2))
-                            connection.query(sql, values, function (err, result, fields) {
-                                if (err) return console.log(err);
-                            });
+                        values=values.concat([json.items[item].tooltipParams.enchant])
+                        var sql = "INSERT INTO gt_character_gear(character_id, slot, item_id, item_lvl, has_gem_slot, is_enchanteable, gem, enchant) " +
+                            "VALUES( ?, ?, ?, ?, ?, ?, ?, ? ) " +
+                            "ON DUPLICATE KEY UPDATE item_id = ?, item_lvl = ?, has_gem_slot = ?, is_enchanteable = ?, gem = ?, enchant = ?"
+                        values = [].concat(values,values.slice(2))
+                        connection.query(sql, values, function (err, result, fields) {
+                            if (err) return console.log(err);
                         });
                     });
                 }
@@ -277,31 +276,30 @@ module.exports = function(config,io,connection){
         });
 
         socket.on('get:characters', function(){
-
             connection.query('SELECT * from `gt_character` WHERE `uid`='+socket.request.user.uid+' ORDER BY main DESC', function(err, rows, fields) {
                 if (err) return console.log(err);
                 socket.emit('get:characters', rows);
-
             });
         });
 
         socket.on('get:all-characters', function(){
             connection.query('SELECT * FROM gt_character c INNER JOIN gt_character_gear g ON c.id = g.character_id INNER JOIN gt_user u ON c.uid = u.uid ORDER BY c.name', function(err, rows, fields) {
                 if (err) return console.log(err);
-				chars={}
-				rows.forEach(function(row){
-					if (!isset(chars,row.name)){ chars[row.name] = row }
-					if (row.has_gem == 1 && row.gem == 0 ) chars[row.name].missing_gem = "Gemme manquante"
-					if (row.is_enchanteable == 1 ) {
-						if (row.enchant == 0) { chars[row.name][row.slot] = 0 }
-						else { chars[row.name][row.slot] = 1 }
-					}
-				})
-				list=[]
-				for (var car in chars){
-					list=list.concat(chars[car])
-				}
-				console.log(list)
+                chars={}
+                rows.forEach(function(row){
+                    if (!isset(chars,row.name)){ chars[row.name] = row }
+                    if (row.has_gem_slot == 1){
+                        if (row.gem == 0 || row.gem.substring(0,2) != '+50' ) chars[row.name].missing_gem = 1
+                    }
+                    if (row.is_enchanteable == 1 ) {
+                        if (row.enchant == 0) { chars[row.name][row.slot] = 0 }
+                        else { chars[row.name][row.slot] = row.enchant }
+                    }
+                })
+                list=[]
+                for (var car in chars){
+                    list=list.concat(chars[car])
+                }
                 socket.emit('get:all-characters', list);
             });
         });
@@ -312,7 +310,6 @@ module.exports = function(config,io,connection){
                 if (err) return console.log(err);
                 socket.emit('set:character-role', rows);
             });
-
         });
 
         function getBattlenet(url,callback){
