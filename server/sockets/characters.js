@@ -289,7 +289,7 @@ module.exports = function(config,io,connection){
                 rows.forEach(function(row){
                     if (!isset(chars,row.name)){ chars[row.name] = row }
                     if (row.has_gem_slot == 1){
-                        if (row.gem == 0 || row.gem.substring(0,2) != '+50' ) chars[row.name].missing_gem = 1
+                        if (row.gem == 0 || row.gem.substring(0,3) != '+50' ) chars[row.name].missing_gem = 1
                     }
                     if (row.is_enchanteable == 1 ) {
                         if (row.enchant == 0) { chars[row.name][row.slot] = 0 }
