@@ -61,9 +61,10 @@
                                         {{raid.description}}
                                     </div>
                                 </div>
-                                <div>
-                                    <h3>Inscription</h3>
-                                    <form ng-if="role != 'casu' && mainCharacter != 0" ng-submit="addRaidInscription(inscriptionState,inscriptionMessage)">
+                                <div ng-if="(raid.date | amDifference : null) > 0">
+                                <h3>Inscription</h3>
+
+                                    <form ng-if="role != 'casu' && mainCharacter != 0" ng-submit="addRaidInscription(inscriptionState,inscriptionMessage,mainCharacter.id)">
                                         <div class="form-group">
                                             <span class="icon class-{{mainCharacter.class}}">{{mainCharacter.name}}</span>
                                         </div>
