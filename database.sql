@@ -51,18 +51,22 @@ CREATE TABLE IF NOT EXISTS `gt_character` (
 -- --------------------------------------------------------
 
 --
--- Structure de la table `gt_character_enchant`
+-- Structure de la table `gt_character_gear`
 --
 
-DROP TABLE IF EXISTS `gt_character_enchant`;
-CREATE TABLE IF NOT EXISTS `gt_character_enchant` (
-  `id` int(11) NOT NULL,
-  `neck` int(11) NOT NULL,
-  `back` int(11) NOT NULL,
-  `finger1` int(11) NOT NULL,
-  `finger2` int(11) NOT NULL,
-  `mainHand` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
+DROP TABLE IF EXISTS `gt_character_gear`;
+CREATE TABLE IF NOT EXISTS `gt_character_gear` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `character_id` int(11) NOT NULL,
+  `slot` text COLLATE utf8_bin NOT NULL,
+  `item_id` int(11) NOT NULL,
+  `item_lvl` int(11) NOT NULL,
+  `has_gem_slot` int(2) NOT NULL,
+  `is_enchanteable` int(2) NOT NULL,
+  `gem` text COLLATE utf8_bin,
+  `enchant` int(11) COLLATE utf8_bin,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY gt_character_gear_uqidx1 (character_id,slot(15))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
@@ -202,8 +206,8 @@ CREATE TABLE IF NOT EXISTS `sessions` (
 --
 -- Contraintes pour la table `gt_character_enchant`
 --
-ALTER TABLE `gt_character_enchant`
-  ADD CONSTRAINT `gt_character_enchant_ibfk_1` FOREIGN KEY (`id`) REFERENCES `gt_character` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+ALTER TABLE `gt_character_gear`
+  ADD CONSTRAINT `gt_character_gear_ibfk_1` FOREIGN KEY (`character_id`) REFERENCES `gt_character` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
 --
 -- Contraintes pour la table `gt_raid_inscription`
@@ -226,3 +230,40 @@ ALTER TABLE `gt_raid_tab`
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+DROP TABLE IF EXISTS `gt_enchants`;
+
+CREATE TABLE `gt_enchants` (
+  `id` int(11) NOT NULL auto_increment,
+  `enchant_id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `created` datetime NOT NULL,
+  `modified` datetime NOT NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+INSERT INTO `gt_enchants` (`id`, `enchant_id`, `name`, `created`, `modified`)
+VALUES
+	(3591,5384,'Mark of Bleeding Hollow','2015-01-16 18:51:29','2015-01-16 18:51:29'),
+	(3590,5334,'Mark of the Frostwolf','2015-01-16 18:51:29','2015-01-16 18:51:29'),
+	(3589,5337,'Mark of Warsong','2015-01-16 18:51:29','2015-01-16 18:51:29'),
+	(3588,5336,'Mark of Blackrock','2015-01-16 18:51:29','2015-01-16 18:51:29'),
+	(3587,5335,'Mark of Shadowmoon','2015-01-16 18:51:29','2015-01-16 18:51:29'),
+	(3586,5331,'Mark of the Shattered Hand','2015-01-16 18:51:29','2015-01-16 18:51:29'),
+	(3585,5330,'Mark of the Thunderlord','2015-01-16 18:51:29','2015-01-16 18:51:29'),
+	(3584,5314,'+100 Versatility & +10% Speed','2015-01-16 18:51:29','2015-01-16 18:51:29'),
+	(3583,5313,'+100 Multistrike & +10% Speed','2015-01-16 18:51:29','2015-01-16 18:51:29'),
+	(3582,5312,'+100 Mastery & +10% Speed','2015-01-16 18:51:29','2015-01-16 18:51:29'),
+	(3581,5311,'+100 Haste & +10% Speed','2015-01-16 18:51:29','2015-01-16 18:51:29'),
+	(3580,5310,'+100 Critical Strike & +10% Speed','2015-01-16 18:51:29','2015-01-16 18:51:29'),
+	(3579,5321,'+75 Versatility','2015-01-16 18:51:29','2015-01-16 18:51:29'),
+	(3578,5320,'+75 Multistrike','2015-01-16 18:51:29','2015-01-16 18:51:29'),
+	(3576,5318,'+75 Haste','2015-01-16 18:51:29','2015-01-16 18:51:29'),
+	(3577,5319,'+75 Mastery','2015-01-16 18:51:29','2015-01-16 18:51:29'),
+	(3575,5317,'+75 Critical Strike','2015-01-16 18:51:29','2015-01-16 18:51:29'),
+	(3574,5328,'+50 Versatility','2015-01-16 18:51:29','2015-01-16 18:51:29'),
+	(3573,5327,'+50 Multistrike','2015-01-16 18:51:29','2015-01-16 18:51:29'),
+	(3571,5325,'+50 Haste','2015-01-16 18:51:29','2015-01-16 18:51:29'),
+	(3572,5326,'+50 Mastery','2015-01-16 18:51:29','2015-01-16 18:51:29'),
+	(3570,5324,'+50 Critical Strike','2015-01-16 18:51:29','2015-01-16 18:51:29');
+
