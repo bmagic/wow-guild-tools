@@ -354,7 +354,7 @@ guildtoolsApp.controller('RaidEditController', ['$scope', 'socket','$stateParams
 
 }]);
 
-guildtoolsApp.controller('RaidController', ['$scope', 'socket','$stateParams','$location',function($scope,socket,$stateParams,$location){
+guildtoolsApp.controller('RaidController', ['$scope', 'socket','$stateParams','$location','$filter',function($scope,socket,$stateParams,$location,$filter){
 
     $scope.inscriptionState = 'ok';
     $scope.inscriptionMessage = '';
@@ -510,12 +510,20 @@ guildtoolsApp.controller('RaidController', ['$scope', 'socket','$stateParams','$
              });
         }
         try {
+
             compositor = JSON.parse(compositor);
 
             var newCharactersId = allCharactersId;
+            compositor.pool = $filter('unique')(compositor.pool);
+            compositor.group1 = $filter('unique')(compositor.group1);
+            compositor.group2 = $filter('unique')(compositor.group2);
+            compositor.group3 = $filter('unique')(compositor.group3);
+            compositor.group4 = $filter('unique')(compositor.group4);
+            compositor.group5 = $filter('unique')(compositor.group5);
+            compositor.group6 = $filter('unique')(compositor.group6);
 
 
-            // TODO Voir pouquoi ça bug ...
+            // C'est super moche mais it's working
             compositor.pool.forEach(function(id){
                 newCharactersId.splice(newCharactersId.indexOf(id), 1);
                 if ($scope.charactersById[id] == undefined)
@@ -527,26 +535,31 @@ guildtoolsApp.controller('RaidController', ['$scope', 'socket','$stateParams','$
                 if ($scope.charactersById[id] == undefined)
                     compositor.group1.splice(compositor.group1.indexOf(id), 1);
             });
+
             compositor.group2.forEach(function(id){
                 newCharactersId.splice(newCharactersId.indexOf(id), 1);
                 if ($scope.charactersById[id] == undefined)
                     compositor.group2.splice(compositor.group2.indexOf(id), 1);
             });
+
             compositor.group3.forEach(function(id){
                 newCharactersId.splice(newCharactersId.indexOf(id), 1);
                 if ($scope.charactersById[id] == undefined)
                     compositor.group3.splice(compositor.group3.indexOf(id), 1);
             });
+
             compositor.group4.forEach(function(id){
                 newCharactersId.splice(newCharactersId.indexOf(id), 1);
                 if ($scope.charactersById[id] == undefined)
                     compositor.group4.splice(compositor.group4.indexOf(id), 1);
             });
+
             compositor.group5.forEach(function(id){
                 newCharactersId.splice(newCharactersId.indexOf(id), 1);
                 if ($scope.charactersById[id] == undefined)
                     compositor.group5.splice(compositor.group5.indexOf(id), 1);
             });
+
             compositor.group6.forEach(function(id){
                 newCharactersId.splice(newCharactersId.indexOf(id), 1);
                 if ($scope.charactersById[id] == undefined)
