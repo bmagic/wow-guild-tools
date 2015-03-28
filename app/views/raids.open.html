@@ -66,7 +66,7 @@
                             <div ng-if="(raid.date | amDifference : null) > 0">
                                 <h3>Inscription</h3>
 
-                                <form ng-if="role != 'casu' && mainCharacter != 0" ng-submit="addRaidInscription(inscriptionState,inscriptionMessage,inscriptionCharacterId)">
+                                <form ng-submit="addRaidInscription(inscriptionState,inscriptionMessage,inscriptionCharacterId)">
                                     <div class="form-group">
                                         <select required ng-model="inscriptionCharacterId" class="form-control">
                                             <option ng-repeat="character in characters" value="{{character.id}}">{{character.name}}</option>
@@ -90,7 +90,6 @@
                                     <button type="submit" class="btn btn-default">Envoyer</button>
                                 </form>
                                 <div ng-if="mainCharacter == 0">Vous n'avez pas spécifier de personnage rendez vous dans la section <a href="#/personnages">Mes persos</a> et créez en un.</div>
-                                <div ng-if="role == 'casu'">Vous ne pouvez pas participer à ce raid. Demandez à intégrer le roster sur le forum.</div>
                             </div>
                         </div>
                         <div class="col-md-6">

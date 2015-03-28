@@ -70,7 +70,7 @@ module.exports = function(config,io,connection){
         });
 
         function getGemName(gemid,values,callback){
-            if (!gemid) { 
+            if (!gemid) {
                 callback(values.concat([false]));
             } else {
                 getBattlenet(config.battlenet.baseurl+"item/"+gemid+"?locale=fr_FR&apikey="+config.battlenet.apikey,function(json) {
@@ -87,7 +87,7 @@ module.exports = function(config,io,connection){
             } else {
                 sql="SELECT name from gt_enchants where enchant_id = ?"
                 connection.query(sql, enchantid, function (err, result, fields) {
-                       if (err) return console.log(err);
+                    if (err) return console.log(err);
                     Enchant = "Unknown enchant " + enchantid
                     if (result.length != 0 && isset(result[0],'name')) Enchant = result[0].name
                     callback(values.concat([Enchant]));
@@ -102,13 +102,13 @@ module.exports = function(config,io,connection){
             }
             async.each(items,function(item){
                 var hasGemSlot = false
-                if (json.items[item].constructor === Object){ 
+                if (json.items[item].constructor === Object){
                     json.items[item].bonusLists.forEach(function(bonus) {
                         if ([563,564,565].indexOf(bonus) != -1) hasGemSlot = true
                     })
                     var isEnchanteable = false
                     if (['neck','back','finger1','finger2','mainHand','offHand'].indexOf(item) != -1) isEnchanteable = true
-    
+
                     var values = [id, item, json.items[item].id, json.items[item].itemLevel, hasGemSlot, isEnchanteable]
                     getGemName(!isset(json,'items.'+item+'.tooltipParams.gem0')?false:json.items[item].tooltipParams.gem0,values,function(values){
                         values=values.concat([json.items[item].tooltipParams.enchant])
@@ -260,9 +260,14 @@ module.exports = function(config,io,connection){
                 if (err) return console.log(err);
                 async.eachSeries(rows, function(character,callback){
                     getBattlenet(config.battlenet.baseurl+"character/"+character.realm+"/"+character.name+"?fields=items,talents&locale=fr_FR&apikey="+config.battlenet.apikey,function(json) {
-                        updateCharacter(character.id,json,function(){
+                        if (json.realm != undefined){
+                            updateCharacter(character.id,json,function(){
+                                callback();
+                            });
+                        }
+                        else
                             callback();
-                        });
+
                     });
                 },function(err){
                     if (err) { console.log(err); }
@@ -294,9 +299,12 @@ module.exports = function(config,io,connection){
         socket.on('get:all-characters', function(){
             connection.query('SELECT * FROM gt_character c INNER JOIN gt_character_gear g ON c.id = g.character_id INNER JOIN gt_user u ON c.uid = u.uid ORDER BY c.name', function(err, rows, fields) {
                 if (err) return console.log(err);
+
                 chars={}
                 rows.forEach(function(row){
-                    if (!isset(chars,row.name)){ chars[row.name] = row }
+
+
+                    if (!isset(chars,row.name)){ row.id = row.character_id;chars[row.name] = row; }
                     if (row.has_gem_slot == 1){
                         if (row.gem == 0 || row.gem.substring(0,3) != '+50' ) chars[row.name].missing_gem = 1
                     }
@@ -307,7 +315,7 @@ module.exports = function(config,io,connection){
                 })
                 list=[]
                 for (var car in chars){
-                    list=list.concat(chars[car])
+                    list=list.concat(chars[car]);
                 }
                 socket.emit('get:all-characters', list);
             });
