@@ -43,8 +43,9 @@ var feeds = require('./sockets/feeds.js')(config,io,connection);
 var simc = require('./sockets/simc.js')(config,connection);
 var cronJob = require('cron').CronJob;
 new cronJob('0 0 * * * *',feeds.fetchFeeds,null, true);
+new cronJob('0 4 * * * *',simc.compute,null, true);
 feeds.fetchFeeds();
-simc.compute();
+//simc.compute();
 
 // Declarations
 var optionsPhpbb3 = {
