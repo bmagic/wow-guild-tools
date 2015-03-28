@@ -40,9 +40,11 @@ require('./sockets/characters.js')(config,io,connection);
 require('./sockets/raids.js')(config,io,connection);
 
 var feeds = require('./sockets/feeds.js')(config,io,connection);
+var simc = require('./sockets/simc.js')(config,connection);
 var cronJob = require('cron').CronJob;
 new cronJob('0 0 * * * *',feeds.fetchFeeds,null, true);
 feeds.fetchFeeds();
+simc.compute();
 
 // Declarations
 var optionsPhpbb3 = {

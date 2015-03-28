@@ -51,6 +51,22 @@ CREATE TABLE IF NOT EXISTS `gt_character` (
 -- --------------------------------------------------------
 
 --
+-- Structure de la table `gt_character_dps`
+--
+
+DROP TABLE IF EXISTS `gt_character_dps`;
+CREATE TABLE IF NOT EXISTS `gt_character_dps` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `character_id` int(11) NOT NULL,
+  `dps` int(11) NOT NULL,
+  `time` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `time` (`time`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
 -- Structure de la table `gt_character_gear`
 --
 
@@ -208,6 +224,12 @@ CREATE TABLE IF NOT EXISTS `sessions` (
 --
 ALTER TABLE `gt_character_gear`
   ADD CONSTRAINT `gt_character_gear_ibfk_1` FOREIGN KEY (`character_id`) REFERENCES `gt_character` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+--
+-- Contraintes pour la table `gt_character_enchant`
+--
+ALTER TABLE `gt_character_dps`
+  ADD CONSTRAINT `gt_character_dps_ibfk_1` FOREIGN KEY (`character_id`) REFERENCES `gt_character` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
 --
 -- Contraintes pour la table `gt_raid_inscription`
