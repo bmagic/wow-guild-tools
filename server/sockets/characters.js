@@ -3,47 +3,38 @@ var https = require('https');
 var async = require('async');
 var fs = require('fs');
 
-
-
 module.exports = function(config,io,connection){
     io.on('connection', function(socket){
 
+        // Main event about character add
         socket.on('add:character',function(obj){
-
-            var sql = "SELECT * FROM gt_character where `name`="+connection.escape(obj.name)+" AND `realm`="+connection.escape(obj.realm);
-            connection.query(sql, function(err, rows, fields) {
+            connection.query("SELECT * FROM gt_character where name = ? and realm = ?",[obj.name,obj.realm], function(err, rows, fields) {
+                // Errors
                 if (err) return console.log(err);
-
                 if (rows.length > 0 ){
                     socket.emit('add:character', {"status": "ko", "message": "Personage déjà présent en base"});
                     return;
                 }
-
-
-                getBattlenet(config.battlenet.baseurl+"character/"+obj.realm+"/"+obj.name+"?fields=items,talents&locale=fr_FR&apikey="+config.battlenet.apikey,function(json) {
+                // Get profile
+                getBattlenetCharacter(obj.name,obj.realm,function(json) {
                     if (json.realm == undefined) {
                         socket.emit('add:character', {"status": "ko", "message": "Personnage introuvable"});
                     }
                     else {
-
-                        var sql = "SELECT * FROM gt_character where `uid`="+connection.escape(socket.request.user.uid);
-                        connection.query(sql, function(err, rows, fields) {
+                        connection.query('SELECT * FROM gt_character where uid = ?',socket.request.user.uid, function(err, rows, fields) {
                             if (err) return console.log(err);
                             var main = 0;
                             if (rows.length == 0)
                                 main=1;
-
+                            // determine spec
                             if (json.talents.length == 1 || json.talents[0].selected == true){
                                 var armory_role = json.talents[0].spec.role;
                                 var spec = json.talents[0].spec.name;
-
                             }
                             else{
                                 var armory_role = json.talents[1].spec.role;
                                 var spec = json.talents[1].spec.name;
-
                             }
-
 
                             var sql = "INSERT INTO gt_character SET uid = " + connection.escape(socket.request.user.uid) + ", " +
                                 "name = " + connection.escape(json.name) + "," +
@@ -57,8 +48,8 @@ module.exports = function(config,io,connection){
                                 "role = " + connection.escape("DPS") + "," +
                                 "armory_role = " + connection.escape(armory_role) + "," +
                                 "spec = " + connection.escape(spec) + "," +
-
                                 "ilvl = " + connection.escape(json.items.averageItemLevelEquipped);
+
                             connection.query(sql, function (err, result, fields) {
                                 if (err) return console.log(err);
                                 downloadImage(config.armory.baseurl+json.thumbnail, '../app/data/thumbnails/'+result.insertId+'.jpg', function(){
@@ -136,7 +127,6 @@ module.exports = function(config,io,connection){
         }
 
         function downloadImage(url, filename, callback){
-            console.log(url);
             try {
                 var file = fs.createWriteStream(filename);
                 http.get(url, function(res) {
@@ -151,16 +141,13 @@ module.exports = function(config,io,connection){
             }
         };
 
-
         function isset(obj, path) {
             var stone;
-
             path = path || '';
 
             if (path.indexOf('[') !== -1) {
                 throw new Error('Unsupported object path notation.');
             }
-
 
             path = path.split('.');
 
@@ -168,79 +155,21 @@ module.exports = function(config,io,connection){
                 if (obj === undefined) {
                     return false;
                 }
-
                 stone = path.shift();
-
                 if (!obj.hasOwnProperty(stone)) {
                     return false;
                 }
-
                 obj = obj[stone];
-
             } while (path.length);
-
             return true;
         }
-        socket.on('delete:character', function(character){
-
-            connection.query('DELETE from `gt_character` WHERE name='+connection.escape(character.name) + ' AND uid='+connection.escape(socket.request.user.uid), function(err, rows, fields) {
-                if (err) return console.log(err);
-                fs.unlinkSync('../app/data/thumbnails/'+character.id+'.jpg');
-                socket.emit('delete:character');
-
-            });
-        });
-
-        socket.on('update:character', function(character) {
-            getBattlenet(config.battlenet.baseurl+"character/"+character.realm+"/"+character.name+"?fields=items,talents&locale=fr_FR&apikey="+config.battlenet.apikey,function(json) {
-                if (json.realm == undefined) {
-                    socket.emit('add:character', {"status": "ko", "message": "Impossible de contacter l'armory"});
-                }
-                else {
-                    updateCharacter(character.id,json,function(){
-                        socket.emit('update:character', {"status": "ok"})
-                    });
-                }
-            });
-
-        });
-
-        socket.on('update:all-characters',function(){
-
-            if (socket.request.user.role != 'officier') {
-                socket.emit('update:all-characters', {"status": "ko"})
-                return;
-            }
-            connection.query('SELECT * from `gt_character`', function(err, rows, fields) {
-                if (err) return console.log(err);
-                async.eachSeries(rows, function(character,callback){
-                    getBattlenet(config.battlenet.baseurl+"character/"+character.realm+"/"+character.name+"?fields=items,talents&locale=fr_FR&apikey="+config.battlenet.apikey,function(json) {
-                        if (json.realm != undefined){
-                            updateCharacter(character.id,json,function(){
-                                callback();
-                            });
-                        }
-                        else
-                            callback();
-
-                    });
-                },function(err){
-                    if (err) { console.log(err); }
-                    socket.emit('update:all-characters', {"status": "ok"})
-                });
-
-            });
-        });
 
         function updateCharacter(id, json, callback){
-
             console.log('update : '+id);
-
 
             downloadImage(config.armory.baseurl+json.thumbnail, '../app/data/thumbnails/'+id+'.jpg', function(){
                 console.log('Done downloading image for character '+json.name);
             });
-
 
             if (json.talents.length == 1 || json.talents[0].selected == true){
                 var armory_role = json.talents[0].spec.role;
@@ -265,8 +194,88 @@ module.exports = function(config,io,connection){
                     callback();
                 });
             });
-
         }
+
+        function getBattlenetCharacter(name,realm,callback) {
+            qs=require('querystring')
+            name=qs.escape(name)
+            realm=qs.escape(realm)
+            url=config.battlenet.baseurl+"character/"+realm+"/"+name+"?fields=items,talents&locale=fr_FR&apikey="+config.battlenet.apikey
+            getBattlenet(url,callback)
+        }
+
+        function getBattlenet(url,callback){
+            try {
+                https.get(url, function(res) {
+                    var body = '';
+                    res.on('data', function(chunk) {
+                        body += chunk;
+                    });
+                    res.on('end', function() {
+                        try {
+                            var json = JSON.parse(body);
+                            callback(json);
+                        } catch(error) {
+                            socket.emit('add:character', {"status": "ko", "message": "Impossible de récupérer le profil armory"});
+                            console.log('Problem getting profile : ' + error)
+                        }
+                    });
+                });
+            } catch(error) {
+                socket.emit('add:character', {"status": "ko", "message": "Impossible de récupérer le profil armory"});
+                console.log('Problem getting profile : ' + error)
+            }
+        }
+
+
+        // EVENTS HANDLE
+        socket.on('delete:character', function(character){
+            connection.query('DELETE from `gt_character` WHERE name='+connection.escape(character.name) + ' AND uid='+connection.escape(socket.request.user.uid), function(err, rows, fields) {
+                if (err) return console.log(err);
+                fs.unlinkSync('../app/data/thumbnails/'+character.id+'.jpg');
+                socket.emit('delete:character');
+            });
+        });
+
+        socket.on('update:character', function(character) {
+            getBattlenet(config.battlenet.baseurl+"character/"+character.realm+"/"+character.name+"?fields=items,talents&locale=fr_FR&apikey="+config.battlenet.apikey,function(json) {
+                if (json.realm == undefined) {
+                    socket.emit('add:character', {"status": "ko", "message": "Impossible de contacter l'armory"});
+                }
+                else {
+                    updateCharacter(character.id,json,function(){
+                        socket.emit('update:character', {"status": "ok"})
+                    });
+                }
+            });
+
+        });
+
+        socket.on('update:all-characters',function(){
+            if (socket.request.user.role != 'officier') {
+                socket.emit('update:all-characters', {"status": "ko"})
+                return;
+            }
+            connection.query('SELECT * from `gt_character`', function(err, rows, fields) {
+                if (err) return console.log(err);
+                async.eachSeries(rows, function(character,callback){
+                    getBattlenet(config.battlenet.baseurl+"character/"+character.realm+"/"+character.name+"?fields=items,talents&locale=fr_FR&apikey="+config.battlenet.apikey,function(json) {
+                        if (json.realm != undefined){
+                            updateCharacter(character.id,json,function(){
+                                callback();
+                            });
+                        }
+                        else
+                            callback();
+
+                    });
+                },function(err){
+                    if (err) { console.log(err); }
+                    socket.emit('update:all-characters', {"status": "ok"})
+                });
+            });
+        });
+
 
         socket.on('set:main-character', function(character) {
             var sql = "UPDATE `gt_character` SET main = 0 WHERE uid=" + connection.escape(character.uid);
@@ -281,21 +290,24 @@ module.exports = function(config,io,connection){
         });
 
         socket.on('get:characters', function(){
-            connection.query('SELECT * from `gt_character` WHERE `uid`='+socket.request.user.uid+' ORDER BY main DESC', function(err, rows, fields) {
+            connection.query('SELECT * from `gt_character` WHERE uid=? ORDER BY main DESC', [socket.request.user.uid], function(err, rows, fields) {
                 if (err) return console.log(err);
                 socket.emit('get:characters', rows);
             });
         });
 
         socket.on('get:all-characters', function(){
-            connection.query('SELECT * FROM gt_character c INNER JOIN gt_character_gear g ON c.id = g.character_id INNER JOIN gt_user u ON c.uid = u.uid ORDER BY c.name', function(err, rows, fields) {
+            var sql = 'SELECT c.*, u.*, g.slot, g.gem, g.enchant, g.has_gem_slot, g.is_enchanteable, d.dps ' +
+                'FROM gt_character c INNER JOIN gt_character_gear g ON c.id = g.character_id ' +
+                'INNER JOIN gt_user u ON c.uid = u.uid ' +
+                'LEFT JOIN gt_character_dps d ON d.character_id = c.id ' +
+                'GROUP BY c.id, g.id HAVING MAX(d.time) ORDER BY c.name'
+            connection.query(sql, function(err, rows, fields) {
                 if (err) return console.log(err);
 
                 chars={}
                 rows.forEach(function(row){
-
-
-                    if (!isset(chars,row.name)){ row.id = row.character_id;chars[row.name] = row; }
+                    if (!isset(chars,row.name)){ row.id = row.character_id; chars[row.name] = row; }
                     if (row.has_gem_slot == 1){
                         if (row.gem == 0 || row.gem.substring(0,3) != '+50' ) chars[row.name].missing_gem = 1
                     }
@@ -320,19 +332,5 @@ module.exports = function(config,io,connection){
             });
         });
 
-        function getBattlenet(url,callback){
-            https.get(url, function(res) {
-                var body = '';
-                res.on('data', function(chunk) {
-                    body += chunk;
-                });
-                res.on('end', function() {
-                    var json = JSON.parse(body);
-                    callback(json);
-                });
-            });
-        }
-
     });
-
 }
