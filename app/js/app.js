@@ -98,6 +98,7 @@ guildtoolsApp.controller('MainController', ['$scope', 'socket','$location','$sta
 
     socket.on('get:all-characters', function(characters){
 
+
         //Le code suivant est moche je sais ... mon cerveau n'arrive pas à produire un truc plus propre pour le moment ...
         var orderCharacters = [];
         var allRaidCharacters = [];
@@ -109,6 +110,7 @@ guildtoolsApp.controller('MainController', ['$scope', 'socket','$location','$sta
             if (orderCharacters[character.uid] == undefined)
                 orderCharacters[character.uid] = [];
 
+            console.log(character);
             charactersById[character.id]=character;
             orderCharacters[character.uid].push(character);
 
@@ -438,7 +440,6 @@ guildtoolsApp.controller('RaidController', ['$scope', 'socket','$stateParams','$
         inscriptions.forEach(function (inscription) {
             inscriptionsByCharacterId[inscription.character_id]=inscription;
 
-            
             allInscriptionsByRole[$scope.charactersById[inscription.character_id].role].push(inscription);
 
             if($scope.charactersById[inscription.character_id].main ==1 && inscription.state == 'ok')
