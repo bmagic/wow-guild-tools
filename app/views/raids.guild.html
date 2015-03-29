@@ -58,7 +58,7 @@
                                 <div ng-if="raid.description != ''">
                                     <h3>Description</h3>
                                     <div>
-                                        {{raid.description}}
+                                        {{raid.date | amDifference : null : 'days'}}
                                     </div>
                                 </div>
                                 <div ng-if="(raid.date | amDifference : null) > 0">

@@ -74,7 +74,7 @@
                             <h4 class="icon dps">DPS CaC ({{charactersByDpsRole.dps_cac.length}})</h4></h4>
                             <div ng-repeat="character in charactersByDpsRole.dps_cac | orderBy:'ilvl':true">
                                 <div ng-class="{ 'last' : $last}" class="roster-character {{character.urole}}">
-                                    <a class="icon class-{{character.class}}" target="_blank" href="{{armoryBaseUrl}}wow/en/character/{{character.realm}}/{{character.name}}/advanced">{{character.name}}</a> ({{character.ilvl}})
+                                    <a class="icon class-{{character.class}}" target="_blank" href="{{armoryBaseUrl}}wow/en/character/{{character.realm}}/{{character.name}}/advanced">{{character.name}}</a> ({{character.ilvl}} - {{character.dps}})
                                     <div ng-if="character.role == character.armory_role">
                                         <div class="text-danger" ng-if="character.missing_gem == 1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Gemme manquante</em></div>
                                         <div class="text-danger" ng-if="character.neck == 0 || enchantsList.indexOf(character.neck) == -1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Enchantement cou</em></div>
@@ -91,7 +91,7 @@
                             <h4 class="icon dps">DPS Distants ({{charactersByDpsRole.dps_distant.length}})</h4></h4>
                             <div ng-repeat="character in charactersByDpsRole.dps_distant | orderBy:'ilvl':true" >
                                 <div ng-class="{ 'last' : $last}" class="roster-character {{character.urole}} ">
-                                    <a class="icon class-{{character.class}}" target="_blank" href="{{armoryBaseUrl}}wow/en/character/{{character.realm}}/{{character.name}}/advanced">{{character.name}}</a> ({{character.ilvl}})
+                                    <a class="icon class-{{character.class}}" target="_blank" href="{{armoryBaseUrl}}wow/en/character/{{character.realm}}/{{character.name}}/advanced">{{character.name}}</a> ({{character.ilvl}} - {{character.dps}})
                                     <div ng-if="character.role == character.armory_role">
                                         <div class="text-danger" ng-if="character.missing_gem == 1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Gemme manquante</em></div>
                                         <div class="text-danger" ng-if="character.neck == 0 || enchantsList.indexOf(character.neck) == -1"><span class="glyphicon glyphicon-exclamation-sign"></span> <em>Enchantement cou</em></div>

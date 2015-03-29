@@ -290,21 +290,24 @@ module.exports = function(config,io,connection){
         });
 
         socket.on('get:characters', function(){
-            connection.query('SELECT * from `gt_character` WHERE `uid`='+socket.request.user.uid+' ORDER BY main DESC', function(err, rows, fields) {
+            connection.query('SELECT * from `gt_character` WHERE uid=? ORDER BY main DESC', [socket.request.user.uid], function(err, rows, fields) {
                 if (err) return console.log(err);
                 socket.emit('get:characters', rows);
             });
         });
 
         socket.on('get:all-characters', function(){
-            connection.query('SELECT * FROM gt_character c INNER JOIN gt_character_gear g ON c.id = g.character_id INNER JOIN gt_user u ON c.uid = u.uid ORDER BY c.name', function(err, rows, fields) {
+            var sql = 'SELECT c.*, u.*, g.slot, g.gem, g.enchant, g.has_gem_slot, g.is_enchanteable, d.dps ' +
+                'FROM gt_character c INNER JOIN gt_character_gear g ON c.id = g.character_id ' +
+                'INNER JOIN gt_user u ON c.uid = u.uid ' +
+                'LEFT JOIN gt_character_dps d ON d.character_id = c.id ' +
+                'GROUP BY c.id, g.id HAVING MAX(d.time) ORDER BY c.name'
+            connection.query(sql, function(err, rows, fields) {
                 if (err) return console.log(err);
 
                 chars={}
                 rows.forEach(function(row){
-
-
-                    if (!isset(chars,row.name)){ row.id = row.character_id;chars[row.name] = row; }
+                    if (!isset(chars,row.name)){ row.id = row.character_id; chars[row.name] = row; }
                     if (row.has_gem_slot == 1){
                         if (row.gem == 0 || row.gem.substring(0,3) != '+50' ) chars[row.name].missing_gem = 1
                     }
