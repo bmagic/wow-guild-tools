@@ -64,6 +64,7 @@ guildtoolsApp.controller('MainController', ['$scope', 'socket','$location','$sta
     $scope.dps_distant = SPEC_DPS_LIST.dps_distant;
     $scope.dps_cac = SPEC_DPS_LIST.dps_cac;
     $scope.armoryBaseUrl =ARMORY_BASEURL;
+    $scope.alertMessages = [];
 
 
     socket.emit('get:user');
@@ -156,6 +157,9 @@ guildtoolsApp.controller('DashboardController', ['$scope', 'socket',function($sc
     socket.emit('get:raids-logs');
     socket.emit('get:next-raids');
 
+    if($scope.role != 'casu')
+        socket.emit('get:raid-missing-inscription');
+
 
     socket.forward('get:feeds', $scope);
     $scope.$on('socket:get:feeds',function(ev,feeds){
@@ -176,6 +180,15 @@ guildtoolsApp.controller('DashboardController', ['$scope', 'socket',function($sc
     socket.forward('get:raids-logs', $scope);
     $scope.$on('socket:get:raids-logs', function(ev,raidsLogs){
         $scope.raidsLogs=raidsLogs.reverse();
+    });
+
+    socket.forward('get:raid-missing-inscription', $scope);
+    $scope.$on('socket:get:raid-missing-inscription', function(ev,raids){
+        raids.forEach(function(raid){
+            var message = {};
+            message.text = "Vous n'avez pas renseigné votre présence pour le raid de guilde : "+raid.name;
+            $scope.alertMessages.push (message);
+        });
     });
 
     $scope.chatSubmit = function(){
@@ -267,8 +280,6 @@ guildtoolsApp.controller('CharactersController', ['$scope', 'socket',function($s
         angular.element('body').addClass('loading');
         socket.emit('set:character-role', {'role':role,'character':character});
     }
-
-
 
 }]);
 
@@ -427,6 +438,7 @@ guildtoolsApp.controller('RaidController', ['$scope', 'socket','$stateParams','$
         inscriptions.forEach(function (inscription) {
             inscriptionsByCharacterId[inscription.character_id]=inscription;
 
+            
             allInscriptionsByRole[$scope.charactersById[inscription.character_id].role].push(inscription);
 
             if($scope.charactersById[inscription.character_id].main ==1 && inscription.state == 'ok')

@@ -90,6 +90,12 @@ module.exports = function(config,io,connection) {
                 io.sockets.emit('delete:raid-tab');
             });
         });
+        socket.on('get:raid-missing-inscription',function(){
+            getRaidMissingInscription(function(raids){
+                socket.emit('get:raid-missing-inscription',raids);
+            })
+
+        });
 
 
 
@@ -170,24 +176,48 @@ module.exports = function(config,io,connection) {
         }
 
         function addUpdateInscription(obj,callback){
-            var sql = "SELECT * FROM gt_raid_inscription WHERE raid_id=? AND uid=?";
-            connection.query(sql,[obj.raid_id,socket.request.user.uid], function (err, inscription, fields) {
+
+            var sql = "SELECT * FROM gt_raid_inscription WHERE raid_id="+connection.escape(obj.raid_id)+" AND uid="+connection.escape(socket.request.user.uid);
+            connection.query(sql, function (err, inscription, fields) {
                 if (err) return console.log(err);
 
                 if (inscription.length == 0 )
                 {
-
-                    connection.query('SELECT * from `gt_character` WHERE `uid`='+socket.request.user.uid+' AND id='+connection.escape(obj.character_id), function(err, characters, fields) {
+                    connection.query('SELECT * FROM gt_character WHERE uid='+connection.escape(socket.request.user.uid)+' AND id='+connection.escape(obj.character_id), function(err, characters, fields) {
                         if (err) return console.log(err);
 
                         if(characters.length == 0)
                             return;
+
+
+
                         //Add new inscription & set logs.
                         var sql = "INSERT INTO gt_raid_inscription(uid, character_id, raid_id, state) " +
                             "VALUES(" + connection.escape(socket.request.user.uid) + ", " +
                             connection.escape(obj.character_id) + ", " +
                             connection.escape(obj.raid_id) + ", " +
                             connection.escape(obj.state) + ")";
+
+
+                        connection.query(sql, function (err, result, fields) {
+                            if (err) return console.log(err);
+
+
+                            var sql = "INSERT INTO gt_raid_log(character_id, raid_id, state, message) "+
+                                "VALUES("+connection.escape(obj.character_id)+", " +
+                                connection.escape(obj.raid_id)+", " +
+                                connection.escape(obj.state)+", " +
+                                connection.escape(obj.message)+")";
+
+                            connection.query(sql, function (err, result, fields) {
+                                if (err) return console.log(err);
+                                callback();
+
+                            });
+
+                        });
+
+
                     });
                 }
                 else
@@ -201,23 +231,28 @@ module.exports = function(config,io,connection) {
                         "state = " + connection.escape(obj.state) + " " +
                         "WHERE uid=" + connection.escape(socket.request.user.uid) +" " +
                         "AND raid_id="+ connection.escape(obj.raid_id);
-                }
 
-                connection.query(sql, function (err, result, fields) {
-                    if (err) return console.log(err);
-
-                    var sql = "INSERT INTO gt_raid_log(character_id, raid_id, state, message) "+
-                        "VALUES("+connection.escape(obj.character_id)+", " +
-                        connection.escape(obj.raid_id)+", " +
-                        connection.escape(obj.state)+", " +
-                        connection.escape(obj.message)+")";
                     connection.query(sql, function (err, result, fields) {
                         if (err) return console.log(err);
-                        callback();
+
+
+                        var sql = "INSERT INTO gt_raid_log(character_id, raid_id, state, message) "+
+                            "VALUES("+connection.escape(obj.character_id)+", " +
+                            connection.escape(obj.raid_id)+", " +
+                            connection.escape(obj.state)+", " +
+                            connection.escape(obj.message)+")";
+                        connection.query(sql, function (err, result, fields) {
+                            if (err) return console.log(err);
+                            callback();
+
+                        });
 
                     });
 
-                });
+                }
+
+
+
             });
         }
         function getRaidLogs(raidId,callback){
@@ -283,6 +318,16 @@ module.exports = function(config,io,connection) {
 
         }
 
+        function getRaidMissingInscription(callback){
+
+            if (socket.request.user.role == 'casu')
+                return;
+            var sql = "SELECT * FROM gt_raid WHERE id NOT IN (SELECT raid_id FROM gt_raid_inscription WHERE uid=?) AND type='guild' AND date > NOW()";
+            connection.query(sql,[socket.request.user.uid], function (err, raids, fields) {
+                if (err) return console.log(err);
+                callback(raids);
+            });
+        }
 
     });
 

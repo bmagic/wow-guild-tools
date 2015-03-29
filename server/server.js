@@ -77,7 +77,8 @@ app.use(function(req, res, next) {
     if (req.isAuthenticated() ||
         req.path.indexOf('/login') != -1 ||
         req.path.indexOf('.css') != -1 ||
-        req.path.indexOf('.js') != -1
+        req.path.indexOf('.js') != -1  ||
+        req.path.indexOf('/roster') != -1
     ) { return next(); }
 
     connectionPhpbb3.query('SELECT config_value from `phpbb_config` where config_name=?', ['cookie_name'], function(err, rows, fields) {
@@ -91,6 +92,16 @@ app.use(function(req, res, next) {
 });
 
 app.use(express.static(path.join(__dirname ,'../app')));
+
+
+// Authentication
+app.get('/roster', function(req, res){
+    connection.query("SELECT * FROM gt_character INNER JOIN gt_user ON gt_character.uid = gt_user.uid WHERE main=1 AND urole!='casu' ORDER BY name", function(err, rows, fields) {
+        if (err) return console.log(err);
+        res.send(rows);
+    });
+});
+
 
 // Authentication
 app.get('/login',
