@@ -8,24 +8,26 @@ module.exports = function(config,connection){
     return {
         compute: function(){
             rp=pr('..')
-            sim="iterations=10000\nxml="+rp+"/app/data/mbwow.result.xml\n"
+            sim="iterations=1000\nxml="+rp+"/app/data/mbwow.result.xml\n"
             console.log("computeDPS with simc");
-            connection.query("SELECT id, name, realm from gt_character where role = 'DPS' and armory_role = 'DPS'", function(err, rows, fields) {
+            connection.query("SELECT id, name, realm from gt_character where role = 'DPS' and level = 100 and armory_role = 'DPS'", function(err, rows, fields) {
                 characters={}
                 for (var row in rows){
-                    sim+="armory=eu,"+rows[row]['realm']+","+rows[row]['name']+"\n"
+                    sim+="armory=eu,\""+rows[row]['realm']+"\","+rows[row]['name']+"\n"
                     characters[rows[row]['name']]=rows[row]['id']
                 }
                 fs.writeFile(rp+"/app/data/mbwow.simc",sim)
 
                 // Purge DB
-                connection.query("DELETE FROM gt_character_dps where time < DATE_SUB(SYSDATE(), INTERVAL 60 DAY)")
-                
+                connection.query("TRUNCATE TABLE gt_character_dps");
+
                 cp('simc ../app/data/mbwow.simc',function(stdout){
+
                     fs.readFile('../app/data/mbwow.result.xml', function(err,data){
                         if(err) {
                             console.log("Simc : could not read XML result file : " + err);
                         } else {
+
                             var parseString = require('xml2js').parseString;
                             parseString(data,function(err,result){
                                 if (err) return false

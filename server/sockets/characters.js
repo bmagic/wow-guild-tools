@@ -297,11 +297,11 @@ module.exports = function(config,io,connection){
         });
 
         socket.on('get:all-characters', function(){
-            var sql = 'SELECT c.*, u.*, g.slot, g.gem, g.enchant, g.has_gem_slot, g.is_enchanteable, d.dps ' +
+            var sql = 'SELECT c.*, u.*, g.character_id, g.slot, g.gem, g.enchant, g.has_gem_slot, g.is_enchanteable, d.dps ' +
                 'FROM gt_character c INNER JOIN gt_character_gear g ON c.id = g.character_id ' +
                 'INNER JOIN gt_user u ON c.uid = u.uid ' +
                 'LEFT JOIN gt_character_dps d ON d.character_id = c.id ' +
-                'GROUP BY c.id, g.id HAVING MAX(d.time) ORDER BY c.name'
+                'ORDER BY c.name'
             connection.query(sql, function(err, rows, fields) {
                 if (err) return console.log(err);
 

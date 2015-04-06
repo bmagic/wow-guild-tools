@@ -1,4 +1,11 @@
 <div class="dashboard">
+    <div ng-if="alertMessages.length > 0 "class="alert alert-warning" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <div ng-repeat="alertMessage in alertMessages">
+            <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+            {{alertMessage.text}}
+        </div>
+    </div>
     <h1>Accueil</h1>
     <div class="row">
         <div class="col-md-4 feeds">
@@ -77,7 +84,7 @@
             </div>
             <div class="online-users panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">En ligne</h3>
+                    <h3 class="panel-title">En ligne ({{(onlineUsers | unique: 'uid').length}})</h3>
                 </div>
                 <div class="panel-body">
 
