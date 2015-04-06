@@ -1,5 +1,5 @@
 fs=require('fs')
-cp=require('child_process').exec
+spawn=require('child_process').spawn
 pr=require('path').resolve
 
 module.exports = function(config,connection){
@@ -19,10 +19,13 @@ module.exports = function(config,connection){
                 fs.writeFile(rp+"/app/data/mbwow.simc",sim)
 
                 // Purge DB
-                connection.query("TRUNCATE TABLE gt_character_dps");
+                connection.query("DELETE FROM gt_character_dps where time < DATE_SUB(SYSDATE(), INTERVAL 60 DAY)")
 
-                cp('simc ../app/data/mbwow.simc',function(stdout){
-
+                var child = spawn('simc',['../app/data/mbwow.simc'])
+                child.stdout.on('data', function(buffer) {
+                    console.log('SIMC output : ' + buffer.toString())
+                });
+                child.stdout.on('end', function(){
                     fs.readFile('../app/data/mbwow.result.xml', function(err,data){
                         if(err) {
                             console.log("Simc : could not read XML result file : " + err);

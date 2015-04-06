@@ -2,6 +2,7 @@ var http = require('http');
 var https = require('https');
 var async = require('async');
 var fs = require('fs');
+var qs=require('querystring')
 
 module.exports = function(config,io,connection){
     io.on('connection', function(socket){
@@ -130,14 +131,18 @@ module.exports = function(config,io,connection){
             try {
                 var file = fs.createWriteStream(filename);
                 http.get(url, function(res) {
-                    res.pipe(file);
-                    file.on('finish', function() {
-                        file.close(callback);
-                    });
+                    try {
+                        res.pipe(file);
+                        file.on('finish', function() {
+                            file.close(callback);
+                        });
+                    } catch (error) {
+                        console.log('Problem getting profile image : ' + error)
+                    }
                 });
             } catch(error) {
                 socket.emit('add:character', {"status": "ko", "message": "Impossible de récupérer l'image de profil"});
-                console.log('Problem getting profile image : ' + err)
+                console.log('Problem getting profile image : ' + error)
             }
         };
 
@@ -167,10 +172,6 @@ module.exports = function(config,io,connection){
         function updateCharacter(id, json, callback){
             console.log('update : '+id);
 
-            downloadImage(config.armory.baseurl+json.thumbnail, '../app/data/thumbnails/'+id+'.jpg', function(){
-                console.log('Done downloading image for character '+json.name);
-            });
-
             if (json.talents.length == 1 || json.talents[0].selected == true){
                 var armory_role = json.talents[0].spec.role;
                 var spec = json.talents[0].spec.name;
@@ -191,13 +192,16 @@ module.exports = function(config,io,connection){
             connection.query(sql, function (err, rows, fields) {
                 if (err) return console.log(err);
                 setGear(id,json,function(){
+                    downloadImage(config.armory.baseurl+json.thumbnail, '../app/data/thumbnails/'+id+'.jpg', function(){
+                        console.log('Done downloading image for character '+json.name);
+                    });
+
                     callback();
                 });
             });
         }
 
         function getBattlenetCharacter(name,realm,callback) {
-            qs=require('querystring')
             name=qs.escape(name)
             realm=qs.escape(realm)
             url=config.battlenet.baseurl+"character/"+realm+"/"+name+"?fields=items,talents&locale=fr_FR&apikey="+config.battlenet.apikey
@@ -238,7 +242,7 @@ module.exports = function(config,io,connection){
         });
 
         socket.on('update:character', function(character) {
-            getBattlenet(config.battlenet.baseurl+"character/"+character.realm+"/"+character.name+"?fields=items,talents&locale=fr_FR&apikey="+config.battlenet.apikey,function(json) {
+            getBattlenetCharacter(character.name,character.realm,function(json) {
                 if (json.realm == undefined) {
                     socket.emit('add:character', {"status": "ko", "message": "Impossible de contacter l'armory"});
                 }
@@ -259,7 +263,7 @@ module.exports = function(config,io,connection){
             connection.query('SELECT * from `gt_character`', function(err, rows, fields) {
                 if (err) return console.log(err);
                 async.eachSeries(rows, function(character,callback){
-                    getBattlenet(config.battlenet.baseurl+"character/"+character.realm+"/"+character.name+"?fields=items,talents&locale=fr_FR&apikey="+config.battlenet.apikey,function(json) {
+                    getBattlenetCharacter(character.name,character.realm,function(json) {
                         if (json.realm != undefined){
                             updateCharacter(character.id,json,function(){
                                 callback();
@@ -301,6 +305,7 @@ module.exports = function(config,io,connection){
                 'FROM gt_character c INNER JOIN gt_character_gear g ON c.id = g.character_id ' +
                 'INNER JOIN gt_user u ON c.uid = u.uid ' +
                 'LEFT JOIN gt_character_dps d ON d.character_id = c.id ' +
+                'GROUP BY c.id, g.id HAVING MAX(d.time) OR count(d.time) = 0 ' +
                 'ORDER BY c.name'
             connection.query(sql, function(err, rows, fields) {
                 if (err) return console.log(err);
