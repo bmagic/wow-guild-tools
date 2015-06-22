@@ -109,7 +109,7 @@ module.exports = function(config,io,connection) {
         }
 
         function getPrevRaids(callback){
-            var sql = "SELECT * FROM gt_raid WHERE date < NOW() ORDER BY date LIMIT 5";
+            var sql = "SELECT * FROM gt_raid WHERE date < NOW() ORDER BY date DESC LIMIT 5";
             connection.query(sql, function (err, raids, fields) {
                 if (err) return console.log(err);
                 callback(raids);

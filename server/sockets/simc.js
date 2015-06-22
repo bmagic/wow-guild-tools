@@ -8,7 +8,7 @@ module.exports = function(config,connection){
     return {
         compute: function(){
             rp=pr('..')
-            sim="iterations=1000\nxml="+rp+"/app/data/mbwow.result.xml\n"
+            sim="iterations=10000\nxml="+rp+"/app/data/mbwow.result.xml\n"
             console.log("computeDPS with simc");
             connection.query("SELECT id, name, realm from gt_character where role = 'DPS' and level = 100 and armory_role = 'DPS'", function(err, rows, fields) {
                 characters={}
